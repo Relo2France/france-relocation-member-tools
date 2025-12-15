@@ -36,6 +36,58 @@ class FRAMT_AI_Guide_Generator {
     }
 
     /**
+     * Get visa application guide data from knowledge base
+     * This data is updated weekly by the main plugin's scraper
+     */
+    private function get_visa_guide_kb_data() {
+        $knowledge_base = get_option('fra_knowledge_base', array());
+        return $knowledge_base['visa_application_guide'] ?? array();
+    }
+
+    /**
+     * Format KB fees data into a string for the AI prompt
+     */
+    private function format_kb_fees_for_prompt($kb_data) {
+        $fees = $kb_data['fees_and_costs'] ?? array();
+        $docs = $kb_data['document_requirements'] ?? array();
+        $financial = $docs['financial_thresholds'] ?? array();
+        $tls = $kb_data['tlscontact_info'] ?? array();
+
+        $lines = array();
+
+        // Visa fees
+        $visa_fee = $fees['visa_application_fee'] ?? '€99';
+        $tls_fee = $fees['tlscontact_service_fee'] ?? $tls['service_fee'] ?? '€43';
+        $ofii_fee = $fees['ofii_validation_tax'] ?? '€225';
+
+        $lines[] = "- Visa Application Fee: {$visa_fee} per person";
+        $lines[] = "- TLScontact Service Fee: {$tls_fee} per person";
+        $lines[] = "- OFII Validation Tax: {$ofii_fee} per person";
+
+        // Financial thresholds
+        $monthly_individual = $financial['individual_monthly'] ?? '€1,450';
+        $monthly_couple = $financial['couple_monthly'] ?? '€2,175';
+        $annual_individual = $financial['annual_individual'] ?? '€17,400';
+        $annual_couple = $financial['annual_couple'] ?? '€26,100';
+
+        $lines[] = "- Financial Requirement (Individual): {$monthly_individual}/month or {$annual_individual}/year";
+        $lines[] = "- Financial Requirement (Couple): {$monthly_couple}/month or {$annual_couple}/year";
+
+        // Other estimates
+        $translation_est = $fees['certified_translation_estimate'] ?? '€30-50 per document';
+        $insurance_est = $fees['health_insurance_annual_estimate'] ?? '€600-1,200';
+
+        $lines[] = "- Certified Translation: {$translation_est}";
+        $lines[] = "- Health Insurance (12 months): {$insurance_est}";
+
+        // TLScontact note
+        $tls_note = $tls['note'] ?? 'TLScontact handles visa appointments in the US';
+        $lines[] = "- Note: {$tls_note}";
+
+        return implode("\n", $lines);
+    }
+
+    /**
      * Check if API is configured
      */
     public function is_configured() {
@@ -527,6 +579,11 @@ Format as clean HTML with comparison tables where appropriate. Be specific and a
         // Build the comprehensive prompt with visa-specific requirements
         $visa_specific_info = $this->get_visa_specific_requirements($visa_type);
 
+        // Get current data from knowledge base (updated weekly)
+        $kb_data = $this->get_visa_guide_kb_data();
+        $current_fees = $this->format_kb_fees_for_prompt($kb_data);
+        $kb_last_verified = $kb_data['lastVerified'] ?? 'December 2025';
+
         return "You are an expert French immigration attorney and visa consultant specializing in helping Americans relocate to France. Generate a comprehensive, personalized step-by-step visa application guide.
 
 USER SITUATION:
@@ -541,8 +598,12 @@ USER SITUATION:
 " . ($income_desc ? "- {$income_desc}\n" : "") . "
 " . ($french_proficiency ? "- French Language Level: {$french_proficiency}\n" : "") . "
 - Current Date: {$current_date}
+- Data Last Verified: {$kb_last_verified}
 
 {$visa_specific_info}
+
+CURRENT FEES AND COSTS (verified {$kb_last_verified}):
+{$current_fees}
 
 Generate a detailed, personalized visa application guide following this EXACT structure:
 
