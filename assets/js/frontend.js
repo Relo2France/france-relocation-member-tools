@@ -747,8 +747,8 @@
                 self.showWelcomeChat();
             });
             
-            // Guide buttons
-            $(document).off('click.framt-guide').on('click.framt-guide', '.framt-guide-card button, [data-action="view-guide"]', function(e) {
+            // Guide view-info buttons only (not generate buttons - those are handled by the main action handler)
+            $(document).off('click.framt-guide').on('click.framt-guide', '[data-action="view-guide"]', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 var guideId = $(this).data('guide') || $(this).closest('[data-guide]').data('guide');
@@ -1440,6 +1440,7 @@
             if (!container) return;
             
             var guideTitles = {
+                'visa-application': 'Step-by-Step Visa Application Guide',
                 'apostille': 'Apostille Guide',
                 'pet-relocation': 'Pet Relocation Guide',
                 'french-mortgages': 'French Mortgage Guide',
