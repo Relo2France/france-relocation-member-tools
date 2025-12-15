@@ -3,7 +3,7 @@
  * Plugin Name: France Relocation Member Tools
  * Plugin URI: https://relo2france.com
  * Description: Premium member features for the France Relocation Assistant - document generation, checklists, guides, and personalized relocation planning.
- * Version: 1.0.85
+ * Version: 1.0.86
  * Author: Relo2France
  * Author URI: https://relo2france.com
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('FRAMT_VERSION', '1.0.85');
+define('FRAMT_VERSION', '1.0.86');
 define('FRAMT_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('FRAMT_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FRAMT_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -387,6 +387,9 @@ final class FRA_Member_Tools {
             <div class="framt-guide-content">
                 <?php 
                 switch ($guide_id) {
+                    case 'visa-application':
+                        echo $this->render_visa_application_guide();
+                        break;
                     case 'apostille':
                         echo $this->render_apostille_guide($user_id);
                         break;
@@ -566,7 +569,66 @@ final class FRA_Member_Tools {
         <?php
         return ob_get_clean();
     }
-    
+
+    /**
+     * Render visa application guide info page
+     */
+    private function render_visa_application_guide() {
+        ob_start();
+        ?>
+        <div class="framt-guide-section">
+            <h3><?php esc_html_e('About This Guide', 'fra-member-tools'); ?></h3>
+            <p><?php esc_html_e('This AI-powered guide creates a comprehensive, personalized visa application document tailored to your specific situation. It includes:', 'fra-member-tools'); ?></p>
+            <ul>
+                <li><?php esc_html_e('Step-by-step application instructions for your visa type', 'fra-member-tools'); ?></li>
+                <li><?php esc_html_e('Complete document checklist with requirements', 'fra-member-tools'); ?></li>
+                <li><?php esc_html_e('Personalized timeline based on your target move date', 'fra-member-tools'); ?></li>
+                <li><?php esc_html_e('Current fees and costs breakdown', 'fra-member-tools'); ?></li>
+                <li><?php esc_html_e('TLScontact appointment booking guidance', 'fra-member-tools'); ?></li>
+                <li><?php esc_html_e('OFII visa validation instructions', 'fra-member-tools'); ?></li>
+                <li><?php esc_html_e('Pro tips and insider knowledge', 'fra-member-tools'); ?></li>
+            </ul>
+        </div>
+
+        <div class="framt-guide-section">
+            <h3><?php esc_html_e('Supported Visa Types', 'fra-member-tools'); ?></h3>
+            <div class="framt-visa-types-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div class="framt-visa-type-card" style="padding: 1rem; background: #f9fafb; border-radius: 8px; border-left: 3px solid #d4a853;">
+                    <strong><?php esc_html_e('VLS-TS Visiteur', 'fra-member-tools'); ?></strong>
+                    <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #6b7280;"><?php esc_html_e('For non-working visitors, retirees, and those living on savings/investments', 'fra-member-tools'); ?></p>
+                </div>
+                <div class="framt-visa-type-card" style="padding: 1rem; background: #f9fafb; border-radius: 8px; border-left: 3px solid #d4a853;">
+                    <strong><?php esc_html_e('Passeport Talent', 'fra-member-tools'); ?></strong>
+                    <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #6b7280;"><?php esc_html_e('For highly-skilled workers, entrepreneurs, and investors', 'fra-member-tools'); ?></p>
+                </div>
+                <div class="framt-visa-type-card" style="padding: 1rem; background: #f9fafb; border-radius: 8px; border-left: 3px solid #d4a853;">
+                    <strong><?php esc_html_e('VLS-TS Salarié', 'fra-member-tools'); ?></strong>
+                    <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #6b7280;"><?php esc_html_e('For employment with a French company', 'fra-member-tools'); ?></p>
+                </div>
+                <div class="framt-visa-type-card" style="padding: 1rem; background: #f9fafb; border-radius: 8px; border-left: 3px solid #d4a853;">
+                    <strong><?php esc_html_e('Entrepreneur Visa', 'fra-member-tools'); ?></strong>
+                    <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #6b7280;"><?php esc_html_e('For self-employed professionals and business creators', 'fra-member-tools'); ?></p>
+                </div>
+                <div class="framt-visa-type-card" style="padding: 1rem; background: #f9fafb; border-radius: 8px; border-left: 3px solid #d4a853;">
+                    <strong><?php esc_html_e('Student Visa', 'fra-member-tools'); ?></strong>
+                    <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #6b7280;"><?php esc_html_e('For enrollment in French educational institutions', 'fra-member-tools'); ?></p>
+                </div>
+                <div class="framt-visa-type-card" style="padding: 1rem; background: #f9fafb; border-radius: 8px; border-left: 3px solid #d4a853;">
+                    <strong><?php esc_html_e('Family Visas', 'fra-member-tools'); ?></strong>
+                    <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #6b7280;"><?php esc_html_e('Family reunification and spouse of French national', 'fra-member-tools'); ?></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="framt-guide-section" style="background: #fffbeb; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem;">
+            <h3 style="margin-top: 0;"><?php esc_html_e('Ready to Generate Your Guide?', 'fra-member-tools'); ?></h3>
+            <p><?php esc_html_e('Click "Generate for Me" to answer a few quick questions about your situation. The AI will then create a comprehensive, personalized guide that you can download as a Word document.', 'fra-member-tools'); ?></p>
+            <p style="margin-bottom: 0;"><strong><?php esc_html_e('Note:', 'fra-member-tools'); ?></strong> <?php esc_html_e('Information from your Visa Profile will be used to pre-fill answers and personalize your guide.', 'fra-member-tools'); ?></p>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
     /**
      * Render bank ratings guide
      */
