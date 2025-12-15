@@ -1501,10 +1501,10 @@
                 },
                 success: function(response) {
                     self.hideGuideTypingIndicator();
-                    
+
                     if (response.success) {
                         var data = response.data;
-                        
+
                         // Update context
                         if (typeof data.step !== 'undefined') {
                             ctx.step = data.step;
@@ -1512,9 +1512,9 @@
                         if (data.collected) {
                             ctx.answers = data.collected;
                         }
-                        
-                        // Show AI message
-                        self.addGuideChatMessage(data.message, 'ai', data.options, data.multi_select);
+
+                        // Show AI message with prefill value for highlighting
+                        self.addGuideChatMessage(data.message, 'ai', data.options, data.multi_select, data.prefill_value);
                         
                         // Check if guide is ready
                         if (data.guide_ready) {
@@ -1554,40 +1554,48 @@
         /**
          * Add a message to the guide chat
          */
-        addGuideChatMessage: function(content, role, options, multiSelect) {
+        addGuideChatMessage: function(content, role, options, multiSelect, prefillValue) {
             var messagesContainer = document.getElementById('framt-guide-chat-messages');
             if (!messagesContainer) return;
-            
+
             var self = this;
             var messageDiv = document.createElement('div');
             messageDiv.className = 'framt-guide-chat-message framt-guide-chat-' + role;
-            
-            var avatarHtml = role === 'ai' ? 
-                '<div class="framt-guide-chat-avatar">🇫🇷</div>' : 
+
+            var avatarHtml = role === 'ai' ?
+                '<div class="framt-guide-chat-avatar">🇫🇷</div>' :
                 '<div class="framt-guide-chat-avatar">👤</div>';
-            
+
             // Format content (convert markdown-style bold and italic)
             var formattedContent = this.escapeHtml(content)
                 .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
                 .replace(/_([^_]+)_/g, '<em>$1</em>')
                 .replace(/\n/g, '<br>');
-            
+
             var contentHtml = '<div class="framt-guide-chat-bubble">' + formattedContent + '</div>';
-            
+
             messageDiv.innerHTML = avatarHtml + contentHtml;
             messagesContainer.appendChild(messageDiv);
-            
+
             // Add options if provided
             if (options && options.length > 0) {
                 var optionsDiv = document.createElement('div');
                 optionsDiv.className = 'framt-guide-chat-options';
-                
+
                 for (var i = 0; i < options.length; i++) {
                     var opt = options[i];
                     var btn = document.createElement('button');
                     btn.className = 'framt-guide-chat-option';
+
+                    // Highlight the prefilled option from profile
+                    if (prefillValue && opt.value === prefillValue) {
+                        btn.className += ' framt-guide-chat-option-prefilled';
+                        btn.innerHTML = '✓ ' + opt.label;
+                    } else {
+                        btn.textContent = opt.label;
+                    }
+
                     btn.setAttribute('data-value', opt.value);
-                    btn.textContent = opt.label;
                     btn.addEventListener('click', function() {
                         var value = this.getAttribute('data-value');
                         // Disable all options

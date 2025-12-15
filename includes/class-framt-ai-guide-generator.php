@@ -93,16 +93,19 @@ class FRAMT_AI_Guide_Generator {
      * Build pet relocation guide prompt
      */
     private function build_pet_prompt($answers, $profile, $user_name, $current_date) {
-        $pet_type = $answers['pet_type'] ?? 'dog';
+        $pet_type = $answers['pet_type'] ?? $profile['has_pets'] ?? 'dog';
         if (is_array($pet_type)) {
             $pet_type = implode(' and ', $pet_type);
         }
-        
+
         $pet_count = $answers['pet_count'] ?? '1';
         $travel_method = $answers['travel_method'] ?? 'flying_cargo';
         $microchipped = $answers['microchipped'] ?? 'no';
         $rabies_status = $answers['rabies_status'] ?? 'unsure';
-        $move_timeline = $answers['move_timeline'] ?? '3_6_months';
+        $move_timeline = $answers['move_timeline'] ?? $answers['move_date'] ?? $profile['target_move_date'] ?? '3_6_months';
+        $departure_state = $answers['departure_state'] ?? $profile['current_state'] ?? '';
+        $target_location = $profile['target_location'] ?? 'France';
+        $pet_details = $profile['pet_details'] ?? '';
         
         $travel_descriptions = array(
             'flying_cabin' => 'flying with pet in the cabin',
@@ -126,9 +129,11 @@ class FRAMT_AI_Guide_Generator {
 
 USER SITUATION:
 - Name: {$user_name}
-- Pet type: {$pet_type}
+- Pet type: {$pet_type}" . ($pet_details ? " ({$pet_details})" : "") . "
 - Number of pets: {$pet_count}
 - Travel method: {$travel_desc}
+- Departing from: " . ($departure_state ? $departure_state : "United States") . "
+- Destination in France: {$target_location}
 - Current microchip status: {$microchipped}
 - Current rabies vaccination status: {$rabies_status}
 - Timeline to move: {$timeline_desc}
@@ -195,9 +200,31 @@ Format the response as clean HTML with these exact section headers. Use <h2> for
         $early_payoff_year = $answers['early_payoff_year'] ?? '';
         $using_broker = $answers['using_broker'] ?? 'considering';
         $closing_timeline = $answers['closing_timeline'] ?? '3_4_months';
-        
+
+        // Use more profile data
         $target_location = $profile['target_location'] ?? 'France';
-        
+        $employment_status = $profile['employment_status'] ?? '';
+        $income_sources = $profile['income_sources'] ?? array();
+        $visa_type = $profile['visa_type'] ?? '';
+        $applicants = $profile['applicants'] ?? '';
+        $timeline = $profile['timeline'] ?? '';
+
+        // Build profile context
+        $profile_context = '';
+        if ($employment_status) {
+            $profile_context .= "- Employment status: {$employment_status}\n";
+        }
+        if (!empty($income_sources)) {
+            $sources = is_array($income_sources) ? implode(', ', $income_sources) : $income_sources;
+            $profile_context .= "- Income sources: {$sources}\n";
+        }
+        if ($visa_type && $visa_type !== 'undecided') {
+            $profile_context .= "- Visa type: {$visa_type}\n";
+        }
+        if ($applicants) {
+            $profile_context .= "- Applying with: {$applicants}\n";
+        }
+
         return "You are an expert in French mortgages for American buyers. Generate a comprehensive, personalized mortgage evaluation guide.
 
 USER SITUATION:
@@ -211,7 +238,7 @@ USER SITUATION:
 - Using a broker: {$using_broker}
 - Closing timeline: {$closing_timeline}
 - Target location in France: {$target_location}
-- Current date: {$current_date}
+{$profile_context}- Current date: {$current_date}
 
 Generate a detailed mortgage evaluation guide including:
 
@@ -316,7 +343,7 @@ Format as clean HTML. Be specific with state agencies, fees, and timelines. Incl
     }
 
     /**
-     * Build bank ratings guide prompt  
+     * Build bank ratings guide prompt
      */
     private function build_bank_prompt($answers, $profile, $user_name, $current_date) {
         $needs = $answers['banking_needs'] ?? array('daily');
@@ -329,9 +356,31 @@ Format as clean HTML. Be specific with state agencies, fees, and timelines. Incl
         }
         $english_support = $answers['english_support'] ?? 'preferred';
         $online_banking = $answers['online_banking'] ?? 'important';
-        
+
+        // Use profile data for context
+        $french_proficiency = $profile['french_proficiency'] ?? '';
+        $employment_status = $profile['employment_status'] ?? '';
+        $visa_type = $profile['visa_type'] ?? '';
+        $target_location = $profile['target_location'] ?? 'France';
+        $housing_plan = $profile['housing_plan'] ?? '';
+
         $needs_list = implode(', ', $needs);
-        
+
+        // Build additional context from profile
+        $profile_context = '';
+        if ($french_proficiency) {
+            $profile_context .= "- French language level: {$french_proficiency}\n";
+        }
+        if ($employment_status) {
+            $profile_context .= "- Employment status: {$employment_status}\n";
+        }
+        if ($visa_type && $visa_type !== 'undecided') {
+            $profile_context .= "- Visa type: {$visa_type}\n";
+        }
+        if ($housing_plan) {
+            $profile_context .= "- Housing plans: {$housing_plan}\n";
+        }
+
         return "You are an expert in French banking for American expats. Generate a comprehensive, personalized bank comparison guide.
 
 USER SITUATION:
@@ -339,7 +388,8 @@ USER SITUATION:
 - Banking needs: {$needs_list}
 - English support importance: {$english_support}
 - Online banking importance: {$online_banking}
-- Current date: {$current_date}
+- Target location in France: {$target_location}
+{$profile_context}- Current date: {$current_date}
 
 Generate a detailed French bank comparison guide including:
 

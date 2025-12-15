@@ -2737,6 +2737,20 @@
     border-color: #1a1a1a;
 }
 
+/* Prefilled option from profile */
+.framt-guide-chat-option.framt-guide-chat-option-prefilled {
+    background: #f5f5f0;
+    border-color: #d4a853;
+    border-width: 2px;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.framt-guide-chat-option.framt-guide-chat-option-prefilled:hover:not(:disabled) {
+    background: #ebe9e2;
+    border-color: #c49943;
+}
+
 /* Guide Chat Multi-select */
 .framt-guide-chat-multi {
     display: flex;

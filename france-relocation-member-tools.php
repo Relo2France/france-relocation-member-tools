@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('FRAMT_VERSION', '1.0.81');
+define('FRAMT_VERSION', '1.0.82');
 define('FRAMT_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('FRAMT_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FRAMT_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -960,6 +960,12 @@ window.onload = function() {
                             array('value' => 'cat', 'label' => '🐈 Cat'),
                             array('value' => 'both', 'label' => '🐕🐈 Both dog and cat'),
                         ),
+                        'profile_field' => 'has_pets',
+                        'profile_value_map' => array(
+                            'dogs' => 'dog',
+                            'cats' => 'cat',
+                            'both' => 'both',
+                        ),
                     ),
                     array(
                         'key' => 'pet_count',
@@ -986,12 +992,14 @@ window.onload = function() {
                         'question' => __('Which US state will you be departing from?', 'fra-member-tools'),
                         'type' => 'text',
                         'placeholder' => 'e.g., California, Texas, New York...',
+                        'profile_field' => 'current_state',
                     ),
                     array(
                         'key' => 'move_date',
                         'question' => __('When are you planning to move? (This helps create your preparation timeline)', 'fra-member-tools'),
                         'type' => 'text',
                         'placeholder' => 'e.g., March 2025, Summer 2025...',
+                        'profile_field' => 'target_move_date',
                     ),
                 ),
             ),
@@ -1058,6 +1066,14 @@ window.onload = function() {
                             array('value' => 'preferred', 'label' => 'Preferred but not required'),
                             array('value' => 'not_needed', 'label' => 'Not needed - I speak French'),
                         ),
+                        'profile_field' => 'french_proficiency',
+                        'profile_value_map' => array(
+                            'none' => 'essential',
+                            'basic' => 'essential',
+                            'conversational' => 'preferred',
+                            'fluent' => 'not_needed',
+                            'native' => 'not_needed',
+                        ),
                     ),
                     array(
                         'key' => 'online_banking',
@@ -1080,30 +1096,44 @@ window.onload = function() {
     private function get_guide_chat_intro($guide_type, $config, $profile) {
         $user = wp_get_current_user();
         $name = $user->first_name ?: 'there';
-        
+
         $greeting = sprintf(__('Hi %s! ', 'fra-member-tools'), $name) . $config['intro'];
-        
+
         $first_question = $config['questions'][0] ?? null;
-        
+
         if (!$first_question) {
             return array(
                 'message' => $greeting,
                 'generating' => true,
             );
         }
-        
+
         // Check if we can pre-fill from profile
         $profile_hint = '';
+        $prefill_value = null;
+
         if (!empty($first_question['profile_field']) && !empty($profile[$first_question['profile_field']])) {
-            $profile_hint = "\n\n" . sprintf(__('(From your profile: **%s**)', 'fra-member-tools'), $profile[$first_question['profile_field']]);
+            $profile_value = $profile[$first_question['profile_field']];
+            $profile_display = $this->get_profile_display_value($first_question['profile_field'], $profile_value, $profile);
+
+            // Convert profile value to chat option value if needed (reverse mapping)
+            if (!empty($first_question['profile_value_map'])) {
+                $reverse_map = array_flip($first_question['profile_value_map']);
+                $prefill_value = $reverse_map[$profile_value] ?? null;
+            } else {
+                $prefill_value = $profile_value;
+            }
+
+            $profile_hint = "\n\n" . sprintf(__('✅ **From your profile: %s** - click to confirm or choose differently', 'fra-member-tools'), $profile_display);
         }
-        
+
         return array(
             'message' => $greeting . "\n\n" . $first_question['question'] . $profile_hint,
             'options' => $first_question['type'] === 'options' ? $first_question['options'] : null,
             'multi_select' => $first_question['type'] === 'multi' ? $first_question['options'] : null,
             'show_input' => $first_question['type'] === 'text',
             'placeholder' => $first_question['placeholder'] ?? '',
+            'prefill_value' => $prefill_value,
             'step' => 0,
             'collected' => array(),
         );
@@ -1163,13 +1193,26 @@ window.onload = function() {
         if (!$next_question) {
             return $this->generate_guide_from_chat($guide_type, $answers, $profile);
         }
-        
-        // Check profile for pre-fill hint
+
+        // Check profile for pre-fill hint and value
         $profile_hint = '';
+        $prefill_value = null;
+
         if (!empty($next_question['profile_field']) && !empty($profile[$next_question['profile_field']])) {
-            $profile_hint = "\n\n" . sprintf(__('(From your profile: **%s**)', 'fra-member-tools'), $profile[$next_question['profile_field']]);
+            $profile_value = $profile[$next_question['profile_field']];
+            $profile_display = $this->get_profile_display_value($next_question['profile_field'], $profile_value, $profile);
+
+            // Convert profile value to chat option value if needed (reverse mapping)
+            if (!empty($next_question['profile_value_map'])) {
+                $reverse_map = array_flip($next_question['profile_value_map']);
+                $prefill_value = $reverse_map[$profile_value] ?? null;
+            } else {
+                $prefill_value = $profile_value;
+            }
+
+            $profile_hint = "\n\n" . sprintf(__('✅ **From your profile: %s** - click to confirm or choose differently', 'fra-member-tools'), $profile_display);
         }
-        
+
         // Check if this is the last question
         $remaining = 0;
         for ($i = $next_step + 1; $i < count($questions); $i++) {
@@ -1186,18 +1229,19 @@ window.onload = function() {
             }
         }
         $is_last = ($remaining === 0);
-        
+
         $message_text = $next_question['question'] . $profile_hint;
         if ($is_last) {
             $message_text .= "\n\n" . __('_(This is the last question - your guide will be generated after you answer.)_', 'fra-member-tools');
         }
-        
+
         return array(
             'message' => $message_text,
             'options' => $next_question['type'] === 'options' ? $next_question['options'] : null,
             'multi_select' => $next_question['type'] === 'multi' ? $next_question['options'] : null,
             'show_input' => $next_question['type'] === 'text',
             'placeholder' => $next_question['placeholder'] ?? '',
+            'prefill_value' => $prefill_value,
             'step' => $next_step,
             'collected' => $answers,
             'is_last_question' => $is_last,
