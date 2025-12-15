@@ -28,6 +28,11 @@ class FRAMT_Guides {
      */
     public function get_guides() {
         return array(
+            'visa-application' => array(
+                'title' => __('Step-by-Step Visa Application Guide', 'fra-member-tools'),
+                'icon' => '📋',
+                'description' => __('Comprehensive personalized guide with document checklists, timeline, and step-by-step instructions for your specific visa type.', 'fra-member-tools'),
+            ),
             'apostille' => array(
                 'title' => __('Apostille Guide', 'fra-member-tools'),
                 'icon' => '📜',
