@@ -1299,6 +1299,20 @@
     border-color: #1a1a1a;
 }
 
+/* Prefilled option from profile */
+.framt-doc-chat-option.framt-doc-chat-option-prefilled {
+    background: #f5f5f0;
+    border-color: #d4a853;
+    border-width: 2px;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.framt-doc-chat-option.framt-doc-chat-option-prefilled:hover:not(:disabled) {
+    background: #ebe9e2;
+    border-color: #c49943;
+}
+
 /* Chat Input */
 .framt-doc-chat-input-area {
     display: flex;

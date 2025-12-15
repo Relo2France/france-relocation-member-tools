@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('FRAMT_VERSION', '1.0.80');
+define('FRAMT_VERSION', '1.0.81');
 define('FRAMT_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('FRAMT_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FRAMT_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -1374,6 +1374,11 @@ window.onload = function() {
                             array('value' => 'family', 'label' => 'Family with children'),
                         ),
                         'profile_field' => 'applicants',
+                        'profile_value_map' => array(
+                            'solo' => 'alone',
+                            'couple' => 'spouse',
+                            'family' => 'spouse_kids',
+                        ),
                     ),
                 ),
             ),
@@ -1406,6 +1411,12 @@ window.onload = function() {
                             array('value' => 'couple', 'label' => 'Myself and spouse/partner'),
                             array('value' => 'family', 'label' => 'Family with children'),
                         ),
+                        'profile_field' => 'applicants',
+                        'profile_value_map' => array(
+                            'solo' => 'alone',
+                            'couple' => 'spouse',
+                            'family' => 'spouse_kids',
+                        ),
                     ),
                     array(
                         'key' => 'employment_status',
@@ -1417,6 +1428,7 @@ window.onload = function() {
                             array('value' => 'retired', 'label' => 'Retired'),
                             array('value' => 'not_working', 'label' => 'Not currently working (savings/investments)'),
                         ),
+                        'profile_field' => 'employment_status',
                     ),
                     array(
                         'key' => 'employment_details',
@@ -1549,6 +1561,12 @@ window.onload = function() {
                             array('value' => 'couple', 'label' => 'Myself and spouse/partner'),
                             array('value' => 'family', 'label' => 'Family with children'),
                         ),
+                        'profile_field' => 'applicants',
+                        'profile_value_map' => array(
+                            'solo' => 'alone',
+                            'couple' => 'spouse',
+                            'family' => 'spouse_kids',
+                        ),
                     ),
                     array(
                         'key' => 'documents_attached',
@@ -1560,6 +1578,102 @@ window.onload = function() {
             ),
         );
     }
+
+    /**
+     * Get answer-to-profile field mapping for syncing chat answers to profile
+     * This maps document chat answer keys to their corresponding profile fields
+     */
+    private function get_answer_to_profile_mapping() {
+        return array(
+            // Direct mappings (answer key => profile field)
+            'visa_type' => 'visa_type',
+            'employment_status' => 'employment_status',
+            'birth_date' => 'date_of_birth',
+            'target_location' => 'target_location',
+
+            // Applicants mapping with value conversion
+            'applicants' => array(
+                'profile_field' => 'applicants',
+                'value_map' => array(
+                    'solo' => 'alone',
+                    'couple' => 'spouse',
+                    'family' => 'spouse_kids',
+                ),
+            ),
+
+            // Accommodation to housing_plan mapping
+            'accommodation' => array(
+                'profile_field' => 'housing_plan',
+                'value_map' => array(
+                    'purchased' => 'already_own',
+                    'purchasing' => 'buying',
+                    'renting' => 'renting',
+                    'staying_family' => 'renting',
+                    'temporary' => 'undecided',
+                ),
+            ),
+            'accommodation_type' => array(
+                'profile_field' => 'housing_plan',
+                'value_map' => array(
+                    'purchase_complete' => 'already_own',
+                    'purchase_pending' => 'buying',
+                    'rental' => 'renting',
+                    'host' => 'renting',
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Sync document chat answers to user profile
+     * Called after document generation to update profile with new information
+     */
+    private function sync_answers_to_profile($answers, $user_id) {
+        $mapping = $this->get_answer_to_profile_mapping();
+        $profile_updates = array();
+
+        foreach ($answers as $answer_key => $answer_value) {
+            if (!isset($mapping[$answer_key])) {
+                continue;
+            }
+
+            $map_config = $mapping[$answer_key];
+
+            // Handle simple string mapping
+            if (is_string($map_config)) {
+                $profile_updates[$map_config] = $answer_value;
+            }
+            // Handle complex mapping with value conversion
+            elseif (is_array($map_config) && isset($map_config['profile_field'])) {
+                $profile_field = $map_config['profile_field'];
+
+                if (isset($map_config['value_map'][$answer_value])) {
+                    $profile_updates[$profile_field] = $map_config['value_map'][$answer_value];
+                } else {
+                    $profile_updates[$profile_field] = $answer_value;
+                }
+            }
+        }
+
+        // Only update if we have data to sync
+        if (!empty($profile_updates)) {
+            // Get current profile to check what's new
+            $current_profile = FRAMT_Profile::get_instance()->get_profile($user_id);
+
+            // Only update fields that are empty in profile or different
+            $new_updates = array();
+            foreach ($profile_updates as $field => $value) {
+                // Only update if profile field is empty (don't overwrite existing data)
+                if (empty($current_profile[$field])) {
+                    $new_updates[$field] = $value;
+                }
+            }
+
+            if (!empty($new_updates)) {
+                FRAMT_Profile::get_instance()->save_profile($new_updates, $user_id);
+            }
+        }
+    }
     
     /**
      * Get document chat intro message
@@ -1567,44 +1681,73 @@ window.onload = function() {
     private function get_doc_chat_intro($document_type, $config, $profile) {
         $user = wp_get_current_user();
         $name = $profile['legal_first_name'] ?? $user->first_name ?: $user->display_name;
-        
+
         $intro = sprintf(
             __('Hi %s! 👋 I\'ll help you create your **%s**.', 'fra-member-tools'),
             $name,
             $config['title']
         );
-        
-        $intro .= "\n\n" . __('I\'ll ask you a few questions to personalize the document. Some answers may already be filled from your profile.', 'fra-member-tools');
-        
+
+        $intro .= "\n\n" . __('I\'ll ask you a few questions to personalize the document. Some answers may already be filled from your Visa Profile.', 'fra-member-tools');
+
         // Get the first question
         $first_question = $config['questions'][0] ?? null;
-        
+
         if ($first_question) {
             // Check if we have this from profile
             $profile_value = null;
+            $profile_display = null;
+            $prefill_value = null;
+
             if (!empty($first_question['profile_field']) && !empty($profile[$first_question['profile_field']])) {
                 $profile_value = $profile[$first_question['profile_field']];
+                $profile_display = $this->get_profile_display_value($first_question['profile_field'], $profile_value, $profile);
+
+                // Convert profile value to chat option value if needed (reverse mapping)
+                if (!empty($first_question['profile_value_map'])) {
+                    $reverse_map = array_flip($first_question['profile_value_map']);
+                    $prefill_value = $reverse_map[$profile_value] ?? null;
+                } else {
+                    $prefill_value = $profile_value;
+                }
             }
-            
+
             $intro .= "\n\n" . $first_question['question'];
-            
-            if ($profile_value) {
-                $intro .= "\n\n" . sprintf(__('(Based on your profile: **%s** - click to confirm or choose differently)', 'fra-member-tools'), $profile_value);
+
+            if ($profile_display) {
+                $intro .= "\n\n" . sprintf(__('✅ **From your profile: %s** - click to confirm or choose differently', 'fra-member-tools'), $profile_display);
             }
-            
+
             return array(
                 'message' => $intro,
                 'options' => $first_question['type'] === 'options' ? $first_question['options'] : null,
                 'show_input' => $first_question['type'] === 'text',
                 'placeholder' => $first_question['placeholder'] ?? '',
+                'prefill_value' => $prefill_value,
                 'step' => 0,
             );
         }
-        
+
         return array(
             'message' => $intro,
             'show_input' => true,
         );
+    }
+
+    /**
+     * Get display value for a profile field
+     */
+    private function get_profile_display_value($field, $value, $profile) {
+        // Get display labels from profile field definitions
+        $profile_instance = FRAMT_Profile::get_instance();
+        $fields = $profile_instance->get_fields();
+
+        if (isset($fields[$field]) && isset($fields[$field]['options'][$value])) {
+            return $fields[$field]['options'][$value];
+        }
+
+        // Fall back to the raw value
+        return $value;
     }
     
     /**
@@ -1614,17 +1757,17 @@ window.onload = function() {
         $step = $context['step'] ?? 0;
         $answers = $context['answers'] ?? array();
         $questions = $config['questions'];
-        
+
         // Store current answer
         if (isset($questions[$step])) {
             $answers[$questions[$step]['key']] = $message;
         }
-        
+
         // Find next question (handle conditions)
         $next_step = $step + 1;
         while ($next_step < count($questions)) {
             $next_q = $questions[$next_step];
-            
+
             // Check conditions
             if (!empty($next_q['condition'])) {
                 $condition_met = false;
@@ -1641,11 +1784,11 @@ window.onload = function() {
             }
             break;
         }
-        
+
         // Check if we have more questions
         if ($next_step < count($questions)) {
             $next_question = $questions[$next_step];
-            
+
             // Check if this is the last question
             $remaining_questions = 0;
             for ($i = $next_step; $i < count($questions); $i++) {
@@ -1663,23 +1806,37 @@ window.onload = function() {
                 }
             }
             $is_last = ($remaining_questions <= 1);
-            
-            // Check profile for pre-fill
+
+            // Check profile for pre-fill value and display
             $profile_hint = '';
+            $prefill_value = null;
+
             if (!empty($next_question['profile_field']) && !empty($profile[$next_question['profile_field']])) {
-                $profile_hint = "\n\n" . sprintf(__('(From your profile: **%s**)', 'fra-member-tools'), $profile[$next_question['profile_field']]);
+                $profile_value = $profile[$next_question['profile_field']];
+                $profile_display = $this->get_profile_display_value($next_question['profile_field'], $profile_value, $profile);
+
+                // Convert profile value to chat option value if needed (reverse mapping)
+                if (!empty($next_question['profile_value_map'])) {
+                    $reverse_map = array_flip($next_question['profile_value_map']);
+                    $prefill_value = $reverse_map[$profile_value] ?? null;
+                } else {
+                    $prefill_value = $profile_value;
+                }
+
+                $profile_hint = "\n\n" . sprintf(__('✅ **From your profile: %s** - click to confirm or choose differently', 'fra-member-tools'), $profile_display);
             }
-            
-            $message = $next_question['question'] . $profile_hint;
+
+            $response_message = $next_question['question'] . $profile_hint;
             if ($is_last) {
-                $message .= "\n\n" . __('_(This is the last question - your document will be generated after you answer.)_', 'fra-member-tools');
+                $response_message .= "\n\n" . __('_(This is the last question - your document will be generated after you answer.)_', 'fra-member-tools');
             }
-            
+
             return array(
-                'message' => $message,
+                'message' => $response_message,
                 'options' => $next_question['type'] === 'options' ? $next_question['options'] : null,
                 'show_input' => $next_question['type'] === 'text',
                 'placeholder' => $next_question['placeholder'] ?? '',
+                'prefill_value' => $prefill_value,
                 'step' => $next_step,
                 'collected' => $answers,
                 'is_last_question' => $is_last,
@@ -1696,22 +1853,25 @@ window.onload = function() {
     private function generate_document_from_chat($document_type, $answers, $profile) {
         $user = wp_get_current_user();
         $user_id = get_current_user_id();
-        
+
+        // Sync answers to profile (only updates empty fields)
+        $this->sync_answers_to_profile($answers, $user_id);
+
         // Get the AI API key
         $api_key = get_option('fra_api_key');
-        
+
         if (!$api_key) {
             // Fall back to template-based generation
             return $this->generate_template_document($document_type, $answers, $profile);
         }
-        
+
         // Use AI to generate the document
         try {
             $document_content = $this->generate_ai_document($document_type, $answers, $profile, $api_key);
-            
+
             // Save the document
             $doc_id = $this->save_generated_document($user_id, $document_type, $document_content, $answers);
-            
+
             return array(
                 'message' => __('✅ Your document is ready! I\'ve personalized it based on your answers.', 'fra-member-tools'),
                 'generating' => true,

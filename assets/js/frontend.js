@@ -1969,10 +1969,10 @@
                 },
                 success: function(response) {
                     self.hideDocTypingIndicator();
-                    
+
                     if (response.success) {
-                        // Add AI response
-                        self.addDocChatMessage(response.data.message, 'ai', response.data.options);
+                        // Add AI response with prefill value for highlighting
+                        self.addDocChatMessage(response.data.message, 'ai', response.data.options, response.data.prefill_value);
                         self.currentDocContext.messages.push({ role: 'assistant', content: response.data.message });
                         
                         // Update step from server response
@@ -2022,38 +2022,46 @@
         /**
          * Add message to document chat
          */
-        addDocChatMessage: function(content, role, options) {
+        addDocChatMessage: function(content, role, options, prefillValue) {
             var messagesContainer = document.getElementById('framt-doc-chat-messages');
             if (!messagesContainer) return;
-            
+
             var messageDiv = document.createElement('div');
             messageDiv.className = 'framt-doc-chat-message framt-doc-chat-' + role;
-            
-            var avatarHtml = role === 'ai' ? 
-                '<div class="framt-doc-chat-avatar">🇫🇷</div>' : 
+
+            var avatarHtml = role === 'ai' ?
+                '<div class="framt-doc-chat-avatar">🇫🇷</div>' :
                 '<div class="framt-doc-chat-avatar">👤</div>';
-            
+
             var contentHtml = '<div class="framt-doc-chat-bubble">' + this.formatDocChatContent(content) + '</div>';
-            
+
             messageDiv.innerHTML = avatarHtml + contentHtml;
             messagesContainer.appendChild(messageDiv);
-            
+
             // Add options if provided
             if (options && options.length > 0) {
                 var optionsDiv = document.createElement('div');
                 optionsDiv.className = 'framt-doc-chat-options';
-                
+
                 for (var i = 0; i < options.length; i++) {
                     var opt = options[i];
                     var btn = document.createElement('button');
                     btn.className = 'framt-doc-chat-option';
-                    btn.textContent = opt.label;
+
+                    // Highlight the prefilled option from profile
+                    if (prefillValue && opt.value === prefillValue) {
+                        btn.className += ' framt-doc-chat-option-prefilled';
+                        btn.innerHTML = '✓ ' + opt.label;
+                    } else {
+                        btn.textContent = opt.label;
+                    }
+
                     btn.setAttribute('data-value', opt.value);
                     optionsDiv.appendChild(btn);
                 }
                 messagesContainer.appendChild(optionsDiv);
             }
-            
+
             // Scroll to bottom
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         },
