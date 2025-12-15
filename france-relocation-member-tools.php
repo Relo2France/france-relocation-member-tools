@@ -3,7 +3,7 @@
  * Plugin Name: France Relocation Member Tools
  * Plugin URI: https://relo2france.com
  * Description: Premium member features for the France Relocation Assistant - document generation, checklists, guides, and personalized relocation planning.
- * Version: 1.0.80
+ * Version: 1.0.83
  * Author: Relo2France
  * Author URI: https://relo2france.com
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('FRAMT_VERSION', '1.0.82');
+define('FRAMT_VERSION', '1.0.83');
 define('FRAMT_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('FRAMT_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FRAMT_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -1087,9 +1087,81 @@ window.onload = function() {
                     ),
                 ),
             ),
+            'visa-application' => array(
+                'title' => __('Step-by-Step Visa Application Guide', 'fra-member-tools'),
+                'intro' => __("I'll create a comprehensive, personalized visa application guide with step-by-step instructions, document checklists, and timeline for your specific situation.", 'fra-member-tools'),
+                'questions' => array(
+                    array(
+                        'key' => 'visa_type',
+                        'question' => __('Which type of visa are you applying for?', 'fra-member-tools'),
+                        'type' => 'options',
+                        'options' => array(
+                            array('value' => 'visitor', 'label' => 'Visitor Visa (VLS-TS Visiteur)'),
+                            array('value' => 'talent_passport', 'label' => 'Talent Passport'),
+                            array('value' => 'employee', 'label' => 'Employee Visa'),
+                            array('value' => 'entrepreneur', 'label' => 'Entrepreneur Visa'),
+                            array('value' => 'student', 'label' => 'Student Visa'),
+                            array('value' => 'family', 'label' => 'Family Reunification'),
+                            array('value' => 'spouse_french', 'label' => 'Spouse of French National'),
+                            array('value' => 'retiree', 'label' => 'Retiree Visa'),
+                        ),
+                        'profile_field' => 'visa_type',
+                    ),
+                    array(
+                        'key' => 'applicants',
+                        'question' => __('Who is included in this visa application?', 'fra-member-tools'),
+                        'type' => 'options',
+                        'options' => array(
+                            array('value' => 'alone', 'label' => 'Just myself'),
+                            array('value' => 'spouse', 'label' => 'Myself and spouse/partner'),
+                            array('value' => 'spouse_kids', 'label' => 'Family with children'),
+                        ),
+                        'profile_field' => 'applicants',
+                    ),
+                    array(
+                        'key' => 'employment_status',
+                        'question' => __('What is your current employment status?', 'fra-member-tools'),
+                        'type' => 'options',
+                        'options' => array(
+                            array('value' => 'employed', 'label' => 'Employed (W-2 employee)'),
+                            array('value' => 'self_employed', 'label' => 'Self-employed / Business owner'),
+                            array('value' => 'retired', 'label' => 'Retired'),
+                            array('value' => 'not_working', 'label' => 'Not working (savings/investments)'),
+                        ),
+                        'profile_field' => 'employment_status',
+                    ),
+                    array(
+                        'key' => 'current_state',
+                        'question' => __('Which US state do you currently live in? (This determines your consulate)', 'fra-member-tools'),
+                        'type' => 'text',
+                        'placeholder' => 'e.g., California, Texas, New York...',
+                        'profile_field' => 'current_state',
+                    ),
+                    array(
+                        'key' => 'target_move_date',
+                        'question' => __('When do you plan to move to France?', 'fra-member-tools'),
+                        'type' => 'text',
+                        'placeholder' => 'e.g., March 2026, Summer 2026...',
+                        'profile_field' => 'target_move_date',
+                    ),
+                    array(
+                        'key' => 'housing_situation',
+                        'question' => __('What is your housing situation in France?', 'fra-member-tools'),
+                        'type' => 'options',
+                        'options' => array(
+                            array('value' => 'already_own', 'label' => 'Already own property'),
+                            array('value' => 'buying', 'label' => 'In process of buying'),
+                            array('value' => 'renting', 'label' => 'Will rent'),
+                            array('value' => 'staying_with', 'label' => 'Staying with family/friends'),
+                            array('value' => 'undecided', 'label' => 'Not yet decided'),
+                        ),
+                        'profile_field' => 'housing_plan',
+                    ),
+                ),
+            ),
         );
     }
-    
+
     /**
      * Get guide chat intro message
      */

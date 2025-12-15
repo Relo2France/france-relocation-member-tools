@@ -84,6 +84,7 @@ class FRAMT_AI_Guide_Generator {
             'french-mortgages' => $this->build_mortgage_prompt($answers, $profile, $user_name, $current_date),
             'apostille' => $this->build_apostille_prompt($answers, $profile, $user_name, $current_date),
             'bank-ratings' => $this->build_bank_prompt($answers, $profile, $user_name, $current_date),
+            'visa-application' => $this->build_visa_application_prompt($answers, $profile, $user_name, $current_date),
         );
 
         return $prompts[$guide_type] ?? new WP_Error('invalid_guide', __('Invalid guide type', 'fra-member-tools'));
@@ -441,6 +442,335 @@ Format as clean HTML with comparison tables where appropriate. Be specific and a
     }
 
     /**
+     * Build visa application guide prompt
+     */
+    private function build_visa_application_prompt($answers, $profile, $user_name, $current_date) {
+        // Get user's spouse name if applicable
+        $spouse_name = '';
+        if (!empty($profile['spouse_legal_first_name'])) {
+            $spouse_name = $profile['spouse_legal_first_name'];
+            if (!empty($profile['spouse_legal_last_name'])) {
+                $spouse_name .= ' ' . $profile['spouse_legal_last_name'];
+            }
+        }
+
+        // Collect all relevant data from answers and profile
+        $visa_type = $answers['visa_type'] ?? $profile['visa_type'] ?? 'visitor';
+        $applicants = $answers['applicants'] ?? $profile['applicants'] ?? 'alone';
+        $employment_status = $answers['employment_status'] ?? $profile['employment_status'] ?? '';
+        $current_state = $answers['current_state'] ?? $profile['current_state'] ?? '';
+        $target_move_date = $answers['target_move_date'] ?? $profile['target_move_date'] ?? '';
+        $housing_situation = $answers['housing_situation'] ?? $profile['housing_plan'] ?? 'undecided';
+        $target_location = $profile['target_location'] ?? 'France';
+
+        // Additional profile data for context
+        $income_sources = $profile['income_sources'] ?? array();
+        $french_proficiency = $profile['french_proficiency'] ?? '';
+        $num_children = $profile['num_children'] ?? '';
+        $children_ages = $profile['children_ages'] ?? '';
+
+        // Build visa type descriptions
+        $visa_type_names = array(
+            'visitor' => 'VLS-TS Visiteur (Long-Stay Visitor Visa)',
+            'talent_passport' => 'Passeport Talent (Talent Passport)',
+            'employee' => 'VLS-TS Salarié (Employee Visa)',
+            'entrepreneur' => 'VLS-TS Entrepreneur/Profession Libérale',
+            'student' => 'VLS-TS Étudiant (Student Visa)',
+            'family' => 'Regroupement Familial (Family Reunification)',
+            'spouse_french' => 'VLS-TS Conjoint de Français (Spouse of French National)',
+            'retiree' => 'VLS-TS Visiteur (Retiree/Non-Working)',
+        );
+
+        $visa_type_name = $visa_type_names[$visa_type] ?? $visa_type;
+
+        // Build applicants description
+        $applicants_desc = 'applying alone';
+        if ($applicants === 'spouse') {
+            $applicants_desc = 'applying with spouse' . ($spouse_name ? " ({$spouse_name})" : '');
+        } elseif ($applicants === 'spouse_kids') {
+            $children_info = '';
+            if ($num_children) {
+                $children_info = " and {$num_children} child(ren)";
+                if ($children_ages) {
+                    $children_info .= " (ages: {$children_ages})";
+                }
+            }
+            $applicants_desc = 'applying with spouse' . ($spouse_name ? " ({$spouse_name})" : '') . $children_info;
+        }
+
+        // Build employment description
+        $employment_descriptions = array(
+            'employed' => 'currently employed (W-2 employee)',
+            'self_employed' => 'self-employed / business owner',
+            'retired' => 'retired',
+            'not_working' => 'not currently working (living on savings/investments)',
+        );
+        $employment_desc = $employment_descriptions[$employment_status] ?? $employment_status;
+
+        // Build housing description
+        $housing_descriptions = array(
+            'already_own' => 'already owns property in France',
+            'buying' => 'in process of purchasing property',
+            'renting' => 'will rent accommodation',
+            'staying_with' => 'staying with family/friends initially',
+            'undecided' => 'housing not yet determined',
+        );
+        $housing_desc = $housing_descriptions[$housing_situation] ?? $housing_situation;
+
+        // Build income sources string
+        $income_desc = '';
+        if (!empty($income_sources)) {
+            $sources = is_array($income_sources) ? implode(', ', $income_sources) : $income_sources;
+            $income_desc = "Income sources: {$sources}";
+        }
+
+        // Build the comprehensive prompt with visa-specific requirements
+        $visa_specific_info = $this->get_visa_specific_requirements($visa_type);
+
+        return "You are an expert French immigration attorney and visa consultant specializing in helping Americans relocate to France. Generate a comprehensive, personalized step-by-step visa application guide.
+
+USER SITUATION:
+- Name: {$user_name}
+- Visa Type: {$visa_type_name}
+- Application: {$applicants_desc}
+- Employment Status: {$employment_desc}
+- Current US State: " . ($current_state ?: 'Not specified') . "
+- Target Move Date: " . ($target_move_date ?: 'Not specified') . "
+- Housing in France: {$housing_desc}
+- Target Location in France: {$target_location}
+" . ($income_desc ? "- {$income_desc}\n" : "") . "
+" . ($french_proficiency ? "- French Language Level: {$french_proficiency}\n" : "") . "
+- Current Date: {$current_date}
+
+{$visa_specific_info}
+
+Generate a detailed, personalized visa application guide following this EXACT structure:
+
+1. **UNDERSTANDING YOUR VISA APPLICATION**
+   - Explain what the {$visa_type_name} is and who it's for
+   - Confirm this is the right visa for their situation
+   - If applying with spouse/family, explain that EACH PERSON needs a SEPARATE, COMPLETE application
+   - Key requirements and restrictions for this visa type
+
+2. **YOUR SPECIFIC SITUATION**
+   Create a comparison table (if applicable) showing:
+   - Each applicant's details (name, application type, residency intent, income source, work status)
+   - Any special notes for their specific circumstances
+   - Warnings about employment/work restrictions
+
+3. **APPLICATION TIMELINE**
+   - KEY CONSTRAINT: Cannot apply more than 3 months before planned arrival
+   - Create a specific timeline based on their target move date
+   - Include: NOW actions, 1-2 months before, application window, appointment, decision timeline
+   - Format as a clear table with TIMING | ACTION | DETAILS columns
+
+4. **COMPLETE DOCUMENT CHECKLIST**
+   - Emphasize: Need COMPLETE SETS for each applicant, ORIGINALS + PHOTOCOPIES
+   - List documents they can share (marriage cert, property deed, joint accounts)
+
+   For EACH applicant, create a detailed checklist with categories:
+   **Identity & Travel Documents:**
+   - Passport requirements (validity, blank pages, age)
+   - Passport photos (exact specifications)
+   - Application form (CERFA)
+   - Birth certificate with apostille + French translation
+
+   **Proof of Accommodation:**
+   - Based on their housing situation
+
+   **Financial Documentation:**
+   - Bank statements (3-6 months)
+   - Proof of income (specific to their employment status)
+   - Tax returns
+   - Attestation of financial independence (if applicable)
+   - Include minimum income thresholds
+
+   **Health Insurance:**
+   - Minimum €30,000 coverage requirement
+   - Must cover medical repatriation
+   - Must cover entire visa duration (12 months)
+   - Schengen zone validity
+
+   **Marriage/Family Documentation (if applicable):**
+   - Marriage certificate with apostille + translation
+   - Children's birth certificates (if applicable)
+
+   **Additional Forms:**
+   - OFII form
+   - Appointment confirmation
+
+5. **STEP-BY-STEP APPLICATION PROCESS**
+
+   **Phase 1: Online Application (France-Visas Portal)**
+   - Website: france-visas.gouv.fr
+   - Creating accounts (separate for each applicant)
+   - Using the Visa Wizard to select correct visa type
+   - Completing the form correctly for their employment status
+   - Important: Save application numbers
+
+   **Phase 2: Book TLScontact Appointments**
+   - Website: visas-fr.tlscontact.com
+   - NOTE: TLScontact replaced VFS Global as of April 18, 2025
+   - List of US centers (Washington DC, New York, Boston, Atlanta, Miami, Chicago, Houston, Los Angeles, San Francisco, Seattle)
+   - Tips for booking back-to-back appointments
+   - Service fees (~€45 per person)
+
+   **Phase 3: In-Person Appointment**
+   - Arrival time
+   - What NOT to bring (no large bags)
+   - Document organization
+   - Biometrics process
+   - Visa fee: €99 per person
+   - Passport retention notice
+
+   **Phase 4: Wait & Receive Decision**
+   - Processing time (2-4 weeks typical)
+   - How to track status
+   - Passport return by registered mail
+
+6. **AFTER ARRIVAL: VISA VALIDATION**
+   - MANDATORY: Must validate VLS-TS online within 3 months of arrival
+   - Website: administration-etrangers-en-france.interieur.gouv.fr (ANEF platform)
+   - Information needed for validation
+   - Payment: €225 each (€200 OFII tax + €25 stamp duty)
+   - Payment methods (online or tabac shop)
+   - Possible medical examination
+
+7. **TOTAL COSTS SUMMARY**
+   Create a detailed costs table:
+   | EXPENSE | PER PERSON | TOTAL (×number of applicants) |
+   Include:
+   - Visa application fee (€99)
+   - TLScontact service fee (~€45)
+   - OFII validation tax (€225)
+   - Certified French translations (estimate)
+   - Health insurance (12 months estimate)
+   - ESTIMATED TOTAL
+
+8. **PRO TIPS & INSIDER KNOWLEDGE**
+   Include 8-10 specific tips such as:
+   - Applications are truly individual (married couples = separate applications)
+   - Bring extra copies
+   - Original documents aren't kept
+   - Photo specifications
+   - Travel insurance vs health insurance
+   - Appointment booking timing
+   - Financial threshold flexibility for couples
+   - Property deed as strong evidence
+   - OFII validation is online only now
+   - Any visa-specific tips
+
+9. **CONTACT INFORMATION**
+   - TLScontact Helpline
+   - French Consulate Visa Email (based on their state/jurisdiction)
+   - France-Visas Portal
+   - TLScontact Portal
+
+Format the entire guide as clean, professional HTML. Use:
+- <h2> for main section headers (numbered 1-9)
+- <h3> for subsections
+- <h4> for sub-subsections
+- Tables for comparisons, timelines, and costs
+- <ul>/<li> for checklists and lists
+- <strong> for emphasis and important warnings
+- Use ⚠️ emoji for critical warnings
+- Use ✅ for completed/confirmed items
+- Use 📝 for notes
+- Use ℹ️ for informational callouts
+
+Be specific, actionable, and personalized to their exact situation. Include actual fees, timelines, and requirements current as of {$current_date}.";
+    }
+
+    /**
+     * Get visa-specific requirements and notes
+     */
+    private function get_visa_specific_requirements($visa_type) {
+        $requirements = array(
+            'visitor' => "
+VISA-SPECIFIC REQUIREMENTS FOR VLS-TS VISITEUR:
+- This visa is for financially independent individuals who will NOT work in France
+- Must prove sufficient financial resources (~€1,400/month individual, ~€2,100/month couple)
+- Must sign attestation stating they will not engage in professional activity in France
+- Can stay in France full-time (>183 days/year) or part-time
+- Valid for 12 months, renewable as carte de séjour
+- If applicant is employed in US but won't work IN France, they need carefully worded employment letter emphasizing US-based work only
+",
+            'talent_passport' => "
+VISA-SPECIFIC REQUIREMENTS FOR PASSEPORT TALENT:
+- Multiple categories: Company founder, Innovative project, Investor, Researcher, Artist, Skilled worker, etc.
+- Each category has specific requirements
+- Often requires sponsorship or project documentation
+- May require minimum salary thresholds (varies by category)
+- Usually valid for up to 4 years
+- Allows work in France
+- Family members can apply for 'Passeport talent famille'
+- Ask which specific Talent Passport category they're applying for
+",
+            'employee' => "
+VISA-SPECIFIC REQUIREMENTS FOR VLS-TS SALARIÉ:
+- Requires work authorization (autorisation de travail) from French employer
+- French employer must initiate the process through DIRECCTE
+- Employment contract must meet French labor standards
+- Minimum salary may apply
+- Tied to specific employer
+- Valid for duration of contract up to 12 months
+- Renewable as carte de séjour
+",
+            'entrepreneur' => "
+VISA-SPECIFIC REQUIREMENTS FOR ENTREPRENEUR VISA:
+- For self-employed professionals or business creators
+- Requires detailed business plan
+- Must prove economic viability
+- May require professional qualifications
+- Proof of sufficient investment capital
+- Registration with relevant French professional bodies
+- May require approval from relevant chambers (commerce, crafts, etc.)
+",
+            'student' => "
+VISA-SPECIFIC REQUIREMENTS FOR VLS-TS ÉTUDIANT:
+- Requires acceptance from French educational institution
+- Must register through Campus France (mandatory for most nationalities)
+- Proof of sufficient funds for studies (~€615/month or ~€7,380/year)
+- Proof of accommodation for first months
+- May work up to 964 hours/year (about 20 hours/week)
+- Health insurance through French social security system
+- Academic transcripts and diplomas required
+",
+            'family' => "
+VISA-SPECIFIC REQUIREMENTS FOR FAMILY REUNIFICATION:
+- Family member in France must have legal residence for at least 18 months
+- Sponsor must meet income requirements
+- Sponsor must have adequate housing
+- Complex process involving OFII and Prefecture
+- Long processing times (6-12 months)
+- Specific forms and procedures
+",
+            'spouse_french' => "
+VISA-SPECIFIC REQUIREMENTS FOR SPOUSE OF FRENCH NATIONAL:
+- Must be legally married to French citizen
+- Marriage must be recognized in France
+- No minimum duration of marriage required
+- French spouse doesn't need to reside in France
+- Transcription of foreign marriage certificate if married abroad
+- Simpler process than family reunification
+- Grants right to work immediately
+",
+            'retiree' => "
+VISA-SPECIFIC REQUIREMENTS FOR RETIREE VISA:
+- Same visa category as Visitor (VLS-TS Visiteur)
+- Must prove retirement income (pension, investments, social security)
+- Minimum ~€1,400/month individual, ~€2,100/month couple
+- Must sign attestation of no professional activity
+- Proof of stable, ongoing income
+- Valid for 12 months, renewable
+- Consider French tax implications
+",
+        );
+
+        return $requirements[$visa_type] ?? $requirements['visitor'];
+    }
+
+    /**
      * Call the Claude API
      */
     private function call_api($prompt) {
@@ -499,13 +829,15 @@ Format as clean HTML with comparison tables where appropriate. Be specific and a
             'french-mortgages' => 'French Mortgage Evaluation Guide',
             'apostille' => 'Apostille Guide',
             'bank-ratings' => 'French Bank Comparison Guide',
+            'visa-application' => 'Step-by-Step Visa Application Guide',
         );
-        
+
         $subtitles = array(
             'pet-relocation' => 'Personalized for ' . $user_name,
             'french-mortgages' => 'Prepared for ' . $user_name,
             'apostille' => 'Customized for ' . $user_name,
             'bank-ratings' => 'Recommendations for ' . $user_name,
+            'visa-application' => 'Personalized for ' . $user_name,
         );
 
         return array(
