@@ -5,7 +5,7 @@
  * 
  * @package FRA_Member_Tools
  * @since 1.0.0
- * @version 1.0.35
+ * @version 1.0.36
  */
 
 (function($) {
@@ -1487,12 +1487,17 @@
                 this.addGuideChatMessage(message, 'user');
             }
 
+            // Debug: log the isLastQuestion flag
+            console.log('[Guide Chat] isLastQuestion:', ctx.isLastQuestion, 'message:', message);
+
             // Show appropriate indicator based on whether this is the last question
             if (ctx.isLastQuestion) {
                 // Show generating indicator for the final generation
+                console.log('[Guide Chat] Showing GENERATING indicator');
                 this.showGuideGeneratingIndicator();
             } else {
                 // Show typing indicator for regular questions
+                console.log('[Guide Chat] Showing TYPING indicator');
                 this.showGuideTypingIndicator();
             }
             
@@ -1532,6 +1537,7 @@
 
                         // Track if this is the last question (for next submission)
                         ctx.isLastQuestion = data.is_last_question || false;
+                        console.log('[Guide Chat] Received response, is_last_question:', data.is_last_question, 'set ctx.isLastQuestion to:', ctx.isLastQuestion);
 
                         // Show AI message with prefill value for highlighting
                         self.addGuideChatMessage(data.message, 'ai', data.options, data.multi_select, data.prefill_value);
