@@ -727,17 +727,59 @@ Generate a detailed, personalized visa application guide following this EXACT st
    - France-Visas Portal
    - TLScontact Portal
 
-Format the entire guide as clean, professional HTML. Use:
-- <h2> for main section headers (numbered 1-9)
-- <h3> for subsections
-- <h4> for sub-subsections
-- Tables for comparisons, timelines, and costs
-- <ul>/<li> for checklists and lists
-- <strong> for emphasis and important warnings
-- Use ⚠️ emoji for critical warnings
-- Use ✅ for completed/confirmed items
-- Use 📝 for notes
-- Use ℹ️ for informational callouts
+FORMAT AS CLEAN, PROFESSIONAL HTML using these specific classes for optimal rendering:
+
+SECTION HEADERS:
+- <h2>1. Section Title</h2> - Main numbered sections with blue styling
+- <h3>Subsection Title</h3> - Blue subsection headers
+- <h4>Sub-subsection</h4> - Regular sub-subsections
+
+WARNING/ALERT BOXES (use for critical information):
+<div class=\"warning-box\">
+    <div class=\"warning-title\">⚠️ Important Warning</div>
+    <p>Warning text here...</p>
+</div>
+
+INFO BOXES (use for helpful information):
+<div class=\"info-box\">
+    <p>ℹ️ Informational note here...</p>
+</div>
+
+SUCCESS/TIP BOXES:
+<div class=\"success-box\">
+    <p>✅ Success tip or confirmed information...</p>
+</div>
+
+PRO TIP BOXES:
+<div class=\"tip-box\">
+    <div class=\"tip-title\">💡 Pro Tip</div>
+    <p>Insider knowledge here...</p>
+</div>
+
+PHASE HEADERS (for timeline sections):
+<div class=\"phase-header\">Phase 1: Description</div>
+
+TABLES:
+- Use standard <table> with <thead>/<tbody> for all data tables
+- Tables will auto-style with dark blue headers
+- For comparison tables (multiple applicants): <table class=\"comparison-table\">
+- For cost breakdowns: <table class=\"cost-table\">
+- Use <tr class=\"total-row\"> for total row in cost tables
+
+DOCUMENT CHECKLISTS:
+<div class=\"checklist-section\">
+    <div class=\"checklist-category\">Category Name</div>
+    <div class=\"checklist-item\">Document item 1</div>
+    <div class=\"checklist-item\">Document item 2</div>
+</div>
+
+GENERAL FORMATTING:
+- <ul>/<li> for regular lists
+- <strong> for emphasis
+- ⚠️ emoji for critical warnings
+- ✅ for confirmed items
+- 📝 for notes
+- ℹ️ for informational callouts
 
 Be specific, actionable, and personalized to their exact situation. Include actual fees, timelines, and requirements current as of {$current_date}.";
     }
@@ -916,25 +958,36 @@ VISA-SPECIFIC REQUIREMENTS FOR RETIREE VISA:
 
     /**
      * Convert guide to beautifully formatted Word document
+     * Styled to match professional PDF guide layout
      */
     public function to_word_document($guide_data) {
         $title = $guide_data['title'];
         $subtitle = $guide_data['subtitle'] ?? '';
         $date = $guide_data['date'];
         $ai_content = $guide_data['ai_content'];
-        
-        // Braun-inspired color palette
+        $guide_type = $guide_data['type'] ?? '';
+
+        // Professional color palette matching PDF template
         $colors = array(
-            'primary' => '#1a1a1a',      // Near black
-            'secondary' => '#4a4a4a',    // Dark gray
-            'accent' => '#d4a853',       // Warm gold
-            'background' => '#fafaf8',   // Warm white
-            'border' => '#e8e6e1',       // Warm gray
-            'success' => '#4a5d4a',      // Muted green
-            'warning' => '#b8860b',      // Dark goldenrod
-            'muted' => '#6b6b6b',        // Medium gray
+            'primary' => '#2b5797',      // Primary blue (headers)
+            'primary_dark' => '#1e3f6f', // Darker blue (table headers)
+            'text' => '#333333',         // Body text
+            'text_light' => '#666666',   // Secondary text
+            'warning_bg' => '#fff3cd',   // Warning box background
+            'warning_border' => '#ffc107', // Warning box border (amber)
+            'warning_text' => '#856404', // Warning text
+            'info_bg' => '#e7f3ff',      // Info box background
+            'info_border' => '#2b5797',  // Info box border
+            'success_bg' => '#d4edda',   // Success box background
+            'success_border' => '#28a745', // Success border
+            'tip_bg' => '#f8f9fa',       // Tip box background
+            'border' => '#dee2e6',       // Table/general borders
+            'row_alt' => '#f8f9fa',      // Alternating row background
         );
-        
+
+        // Get header text based on guide type
+        $header_text = $this->get_guide_header_text($guide_type, $title);
+
         $html = '<!DOCTYPE html>
 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
 <head>
@@ -942,185 +995,305 @@ VISA-SPECIFIC REQUIREMENTS FOR RETIREE VISA:
 <meta name="ProgId" content="Word.Document">
 <style>
 @page {
-    margin: 1in;
+    margin: 0.75in 1in;
+    mso-header-margin: 0.5in;
+    mso-footer-margin: 0.5in;
 }
 body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Segoe UI", Calibri, Arial, sans-serif;
     font-size: 11pt;
-    line-height: 1.6;
-    color: ' . $colors['primary'] . ';
+    line-height: 1.5;
+    color: ' . $colors['text'] . ';
     background: white;
 }
 
-/* Title Block */
+/* Running Header */
+.page-header {
+    font-size: 9pt;
+    color: ' . $colors['text_light'] . ';
+    border-bottom: 1px solid ' . $colors['border'] . ';
+    padding-bottom: 8pt;
+    margin-bottom: 20pt;
+    text-align: right;
+}
+
+/* Title Block - Centered with visa type */
 .title-block {
     text-align: center;
-    padding: 40pt 0 30pt;
-    border-bottom: 2px solid ' . $colors['accent'] . ';
-    margin-bottom: 30pt;
+    padding: 30pt 0 25pt;
+    margin-bottom: 25pt;
 }
 .title-block h1 {
-    font-size: 28pt;
-    font-weight: 300;
-    letter-spacing: -0.5pt;
-    margin: 0 0 8pt;
+    font-size: 26pt;
+    font-weight: 600;
+    margin: 0 0 10pt;
     color: ' . $colors['primary'] . ';
 }
-.title-block .subtitle {
+.title-block .visa-type {
     font-size: 14pt;
     font-weight: 400;
-    color: ' . $colors['secondary'] . ';
-    margin: 0 0 5pt;
+    color: ' . $colors['text_light'] . ';
+    margin: 0 0 8pt;
+    font-style: italic;
 }
 .title-block .date {
     font-size: 10pt;
-    color: ' . $colors['muted'] . ';
+    color: ' . $colors['text_light'] . ';
     margin: 0;
 }
 
-/* Section Headers */
+/* Warning/Alert Box - Yellow/Amber style */
+.warning-box {
+    background: ' . $colors['warning_bg'] . ';
+    border: 1px solid ' . $colors['warning_border'] . ';
+    border-radius: 4pt;
+    padding: 15pt 18pt;
+    margin: 20pt 0;
+}
+.warning-box .warning-icon {
+    font-size: 14pt;
+    margin-right: 8pt;
+}
+.warning-box .warning-title {
+    font-weight: 600;
+    color: ' . $colors['warning_text'] . ';
+    font-size: 12pt;
+    margin-bottom: 8pt;
+}
+.warning-box p {
+    color: ' . $colors['warning_text'] . ';
+    margin: 0;
+    font-size: 10pt;
+}
+
+/* Info Box - Blue style */
+.info-box {
+    background: ' . $colors['info_bg'] . ';
+    border-left: 4px solid ' . $colors['info_border'] . ';
+    padding: 12pt 15pt;
+    margin: 15pt 0;
+}
+.info-box p {
+    margin: 0;
+    color: ' . $colors['text'] . ';
+}
+
+/* Success/Tip Box */
+.success-box {
+    background: ' . $colors['success_bg'] . ';
+    border-left: 4px solid ' . $colors['success_border'] . ';
+    padding: 12pt 15pt;
+    margin: 15pt 0;
+}
+
+/* Pro Tip Box */
+.tip-box {
+    background: ' . $colors['tip_bg'] . ';
+    border: 1px solid ' . $colors['border'] . ';
+    border-radius: 4pt;
+    padding: 12pt 15pt;
+    margin: 15pt 0;
+}
+.tip-box .tip-title {
+    font-weight: 600;
+    color: ' . $colors['primary'] . ';
+    margin-bottom: 5pt;
+}
+
+/* Section Headers - Blue with numbers */
 h2 {
     font-size: 16pt;
-    font-weight: 500;
+    font-weight: 600;
     color: ' . $colors['primary'] . ';
     margin: 30pt 0 15pt;
-    padding-bottom: 8pt;
-    border-bottom: 1px solid ' . $colors['border'] . ';
+    padding-bottom: 5pt;
+    border-bottom: 2px solid ' . $colors['primary'] . ';
 }
+
+/* Subsection Headers - Blue */
 h3 {
     font-size: 13pt;
-    font-weight: 500;
-    color: ' . $colors['secondary'] . ';
-    margin: 20pt 0 10pt;
+    font-weight: 600;
+    color: ' . $colors['primary'] . ';
+    margin: 22pt 0 10pt;
 }
+
+/* Sub-subsection Headers */
 h4 {
     font-size: 11pt;
     font-weight: 600;
-    color: ' . $colors['secondary'] . ';
+    color: ' . $colors['text'] . ';
     margin: 15pt 0 8pt;
 }
 
 /* Body Text */
 p {
     margin: 0 0 10pt;
-    text-align: justify;
+    line-height: 1.6;
 }
 
 /* Lists */
 ul, ol {
-    margin: 10pt 0 15pt 20pt;
+    margin: 10pt 0 15pt 25pt;
     padding: 0;
 }
 li {
-    margin: 6pt 0;
+    margin: 5pt 0;
     line-height: 1.5;
 }
 
-/* Tables */
+/* Tables - Professional with dark blue headers */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin: 15pt 0;
+    margin: 18pt 0;
     font-size: 10pt;
+    border: 1px solid ' . $colors['border'] . ';
 }
 th {
-    background: ' . $colors['primary'] . ';
+    background: ' . $colors['primary_dark'] . ';
     color: white;
     padding: 10pt 12pt;
     text-align: left;
-    font-weight: 500;
-    font-size: 9pt;
-    text-transform: uppercase;
-    letter-spacing: 0.5pt;
+    font-weight: 600;
+    font-size: 10pt;
+    border: 1px solid ' . $colors['primary_dark'] . ';
 }
 td {
     padding: 10pt 12pt;
-    border-bottom: 1px solid ' . $colors['border'] . ';
+    border: 1px solid ' . $colors['border'] . ';
     vertical-align: top;
 }
 tr:nth-child(even) td {
-    background: ' . $colors['background'] . ';
+    background: ' . $colors['row_alt'] . ';
 }
 
-/* Info Boxes */
-.info-box {
-    background: ' . $colors['background'] . ';
-    border-left: 3px solid ' . $colors['accent'] . ';
-    padding: 12pt 15pt;
-    margin: 15pt 0;
+/* Comparison Table for multiple applicants */
+.comparison-table th {
+    text-align: center;
 }
-.success-box {
-    background: #f0f5f0;
-    border-left: 3px solid ' . $colors['success'] . ';
-    padding: 12pt 15pt;
-    margin: 15pt 0;
+.comparison-table td {
+    text-align: center;
 }
-.warning-box {
-    background: #fffbf5;
-    border-left: 3px solid ' . $colors['warning'] . ';
-    padding: 12pt 15pt;
-    margin: 15pt 0;
+.comparison-table td:first-child {
+    text-align: left;
+    font-weight: 500;
 }
 
-/* Checklist */
-.checklist {
-    background: ' . $colors['background'] . ';
+/* Document Checklist Styling */
+.checklist-section {
+    background: ' . $colors['tip_bg'] . ';
+    border: 1px solid ' . $colors['border'] . ';
+    border-radius: 4pt;
     padding: 15pt 20pt;
     margin: 15pt 0;
 }
+.checklist-category {
+    font-weight: 600;
+    color: ' . $colors['primary'] . ';
+    margin: 12pt 0 8pt;
+    font-size: 11pt;
+}
 .checklist-item {
-    margin: 8pt 0;
-    padding-left: 25pt;
+    margin: 6pt 0;
+    padding-left: 22pt;
     position: relative;
 }
 .checklist-item:before {
     content: "☐";
     position: absolute;
     left: 0;
-    color: ' . $colors['accent'] . ';
+    color: ' . $colors['primary'] . ';
+    font-size: 12pt;
 }
 
-/* Strong/Bold */
-strong {
+/* Timeline/Phase styling */
+.phase-header {
+    background: ' . $colors['info_bg'] . ';
+    padding: 8pt 12pt;
+    margin: 15pt 0 10pt;
+    border-left: 4px solid ' . $colors['primary'] . ';
     font-weight: 600;
     color: ' . $colors['primary'] . ';
 }
 
+/* Cost breakdown table */
+.cost-table td:last-child {
+    text-align: right;
+    font-weight: 500;
+}
+.cost-table tr.total-row td {
+    background: ' . $colors['info_bg'] . ';
+    font-weight: 700;
+    border-top: 2px solid ' . $colors['primary'] . ';
+}
+
+/* Emphasis and highlights */
+strong {
+    font-weight: 600;
+    color: ' . $colors['text'] . ';
+}
+em {
+    font-style: italic;
+}
+
 /* Links */
 a {
-    color: ' . $colors['accent'] . ';
-    text-decoration: none;
+    color: ' . $colors['primary'] . ';
+    text-decoration: underline;
 }
 
 /* Footer */
 .footer {
     margin-top: 40pt;
     padding-top: 15pt;
-    border-top: 1px solid ' . $colors['border'] . ';
+    border-top: 2px solid ' . $colors['border'] . ';
     font-size: 9pt;
-    color: ' . $colors['muted'] . ';
+    color: ' . $colors['text_light'] . ';
     text-align: center;
+}
+.footer p {
+    margin: 3pt 0;
 }
 </style>
 </head>
 <body>
 
+<div class="page-header">' . esc_html($header_text) . '</div>
+
 <div class="title-block">
     <h1>' . esc_html($title) . '</h1>
-    <p class="subtitle">' . esc_html($subtitle) . '</p>
-    <p class="date">' . esc_html($date) . '</p>
+    <p class="visa-type">' . esc_html($subtitle) . '</p>
+    <p class="date">Generated: ' . esc_html($date) . '</p>
 </div>
 
 ' . $ai_content . '
 
 <div class="footer">
-    <p>Generated by France Relocation Assistant • relo2france.com</p>
-    <p>This guide was personalized based on your specific situation. Information is current as of ' . esc_html($date) . '.</p>
+    <p><strong>France Relocation Assistant</strong> • relo2france.com</p>
+    <p>This guide was personalized based on your specific situation.</p>
+    <p>Information current as of ' . esc_html($date) . '. Always verify with official sources before proceeding.</p>
 </div>
 
 </body>
 </html>';
 
         return $html;
+    }
+
+    /**
+     * Get header text for guide type
+     */
+    private function get_guide_header_text($guide_type, $title) {
+        $headers = array(
+            'visa-application' => 'France VLS-TS Visa Application Guide',
+            'healthcare' => 'France Healthcare Navigation Guide',
+            'banking' => 'France Banking Setup Guide',
+            'housing' => 'France Housing Search Guide',
+            'relocation-timeline' => 'France Relocation Timeline',
+            'bank-ratings' => 'France Bank Comparison Guide',
+        );
+
+        return $headers[$guide_type] ?? $title;
     }
 }

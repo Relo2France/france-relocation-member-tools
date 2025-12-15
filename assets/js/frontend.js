@@ -5,7 +5,7 @@
  * 
  * @package FRA_Member_Tools
  * @since 1.0.0
- * @version 1.0.34
+ * @version 1.0.35
  */
 
 (function($) {
@@ -1091,6 +1091,14 @@
                 case 'back-to-guides':
                     this.loadSection('guides');
                     break;
+                case 'restart-guide-chat':
+                    // Restart the current guide from the beginning
+                    if (this.currentGuideContext && this.currentGuideContext.type) {
+                        this.startGuideGeneration(this.currentGuideContext.type);
+                    } else {
+                        this.loadSection('guides');
+                    }
+                    break;
                 case 'back-to-documents':
                     this.loadSection('create-documents');
                     break;
@@ -1471,16 +1479,22 @@
         sendGuideChatMessage: function(message, isStart) {
             var self = this;
             var ctx = this.currentGuideContext;
-            
+
             if (!ctx) return;
-            
+
             // Show user message (unless it's the start)
             if (!isStart && message !== 'start') {
                 this.addGuideChatMessage(message, 'user');
             }
-            
-            // Show typing indicator
-            this.showGuideTypingIndicator();
+
+            // Show appropriate indicator based on whether this is the last question
+            if (ctx.isLastQuestion) {
+                // Show generating indicator for the final generation
+                this.showGuideGeneratingIndicator();
+            } else {
+                // Show typing indicator for regular questions
+                this.showGuideTypingIndicator();
+            }
             
             // Hide input while processing
             var inputArea = document.getElementById('framt-guide-chat-input-area');
@@ -1501,7 +1515,9 @@
                     })
                 },
                 success: function(response) {
+                    // Hide both indicator types
                     self.hideGuideTypingIndicator();
+                    self.hideGuideGeneratingIndicator();
 
                     if (response.success) {
                         var data = response.data;
@@ -1514,9 +1530,12 @@
                             ctx.answers = data.collected;
                         }
 
+                        // Track if this is the last question (for next submission)
+                        ctx.isLastQuestion = data.is_last_question || false;
+
                         // Show AI message with prefill value for highlighting
                         self.addGuideChatMessage(data.message, 'ai', data.options, data.multi_select, data.prefill_value);
-                        
+
                         // Check if guide is ready
                         if (data.guide_ready) {
                             self.showGeneratedGuide({
@@ -1542,6 +1561,7 @@
                 },
                 error: function(xhr, status, error) {
                     self.hideGuideTypingIndicator();
+                    self.hideGuideGeneratingIndicator();
                     if (status === 'timeout') {
                         self.addGuideChatMessage('The request is taking longer than expected. Please try again.', 'ai');
                     } else {
@@ -1685,6 +1705,42 @@
         },
 
         /**
+         * Show generating indicator for guide (nice amber box like documents)
+         */
+        showGuideGeneratingIndicator: function() {
+            var messagesContainer = document.getElementById('framt-guide-chat-messages');
+            if (!messagesContainer) return;
+
+            // Remove any existing indicators
+            var existing = messagesContainer.querySelector('.framt-guide-typing');
+            if (existing) existing.remove();
+
+            var indicator = document.createElement('div');
+            indicator.className = 'framt-guide-chat-message framt-guide-chat-ai framt-guide-generating';
+            indicator.innerHTML = '<div class="framt-guide-chat-avatar">🇫🇷</div>' +
+                '<div class="framt-generating-message">' +
+                    '<div class="framt-generating-icon">📋</div>' +
+                    '<div class="framt-generating-text">' +
+                        '<strong>Generating your personalized guide...</strong>' +
+                        '<p>This may take 15-30 seconds. Please wait.</p>' +
+                    '</div>' +
+                    '<div class="framt-generating-spinner"></div>' +
+                '</div>';
+            messagesContainer.appendChild(indicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        },
+
+        /**
+         * Hide generating indicator for guide
+         */
+        hideGuideGeneratingIndicator: function() {
+            var indicator = document.querySelector('.framt-guide-generating');
+            if (indicator) {
+                indicator.remove();
+            }
+        },
+
+        /**
          * Show guide question (legacy - kept for compatibility)
          * @param {number} index - Question index
          */
@@ -1816,38 +1872,82 @@
         },
 
         /**
-         * Show generated guide
+         * Show generated guide ready UI (in chat, matching document flow)
          * @param {Object} data - Guide data from server
          */
         showGeneratedGuide: function(data) {
-            var container = document.getElementById('fra-member-content-body') || 
+            var messagesContainer = document.getElementById('framt-guide-chat-messages');
+
+            // If in chat mode, show the nice ready card in chat
+            if (messagesContainer) {
+                // Hide generating indicator
+                this.hideGuideGeneratingIndicator();
+                this.hideGuideTypingIndicator();
+
+                // Get guide title
+                var guideTitles = {
+                    'visa-application': 'Step-by-Step Visa Application Guide',
+                    'healthcare': 'Healthcare Navigation Guide',
+                    'banking': 'Banking Setup Guide',
+                    'housing': 'Housing Search Guide',
+                    'relocation-timeline': 'Relocation Timeline',
+                    'bank-ratings': 'French Bank Comparison Guide',
+                    'pet-relocation': 'Pet Relocation Guide',
+                    'french-mortgages': 'French Mortgage Evaluation Guide',
+                    'apostille': 'Apostille Guide'
+                };
+                var guideType = this.currentGuideContext?.type || '';
+                var guideTitle = data.title || guideTitles[guideType] || 'Your Guide';
+
+                var readyDiv = document.createElement('div');
+                readyDiv.className = 'framt-guide-ready';
+                readyDiv.innerHTML = '<div class="framt-doc-ready-content">' +
+                    '<h3>✅ Your guide is ready!</h3>' +
+                    '<p>' + this.escapeHtml(guideTitle) + '</p>' +
+                    '<p class="framt-doc-ready-note">Your guide will be saved to "My Visa Documents" when you download it.</p>' +
+                    '<div class="framt-doc-ready-actions">' +
+                        '<button class="framt-btn framt-btn-primary framt-btn-large" data-action="download-guide-word" data-guide-id="' + data.guide_id + '">📄 Download Word</button>' +
+                        '<button class="framt-btn framt-btn-secondary framt-btn-large" data-action="download-guide-pdf" data-guide-id="' + data.guide_id + '">🖨️ Print / PDF</button>' +
+                    '</div>' +
+                    '<div class="framt-doc-ready-secondary">' +
+                        '<button class="framt-btn framt-btn-ghost" data-action="restart-guide-chat">🔄 Start Over</button>' +
+                        '<button class="framt-btn framt-btn-ghost" data-action="back-to-guides">📁 Create Different Guide</button>' +
+                    '</div>' +
+                '</div>';
+                messagesContainer.appendChild(readyDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                return;
+            }
+
+            // Fallback for non-chat mode
+            var container = document.getElementById('fra-member-content-body') ||
                            document.getElementById('fra-member-content');
-            
+
             if (!container) return;
-            
+
             var html = '<div class="framt-guide-result">' +
                 '<div class="framt-guide-header">' +
                     '<button class="framt-btn framt-btn-small framt-btn-ghost" data-action="back-to-guides">← Back to Guides</button>' +
                     '<h2>' + this.escapeHtml(data.title) + '</h2>';
-            
+
             if (data.ai_generated) {
                 html += '<p class="framt-ai-badge">✨ AI-Generated & Personalized</p>';
             }
-            
+
             html += '</div>' +
                 '<div class="framt-guide-content">';
-            
+
             if (data.preview) {
                 html += '<div class="framt-guide-preview"><p>' + this.escapeHtml(data.preview) + '</p></div>';
             }
-            
+
             html += '</div>' +
                 '<div class="framt-guide-actions">' +
                     '<button class="framt-btn framt-btn-primary framt-btn-large" data-action="download-guide-word" data-guide-id="' + data.guide_id + '">📄 Download Word Document</button>' +
                     '<button class="framt-btn framt-btn-secondary framt-btn-large" data-action="download-guide-pdf" data-guide-id="' + data.guide_id + '">🖨️ Print / Save as PDF</button>' +
                 '</div>' +
             '</div>';
-            
+
             container.innerHTML = html;
         },
 

@@ -3,7 +3,7 @@
  * Plugin Name: France Relocation Member Tools
  * Plugin URI: https://relo2france.com
  * Description: Premium member features for the France Relocation Assistant - document generation, checklists, guides, and personalized relocation planning.
- * Version: 1.0.87
+ * Version: 1.0.90
  * Author: Relo2France
  * Author URI: https://relo2france.com
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin constants
-define('FRAMT_VERSION', '1.0.87');
+define('FRAMT_VERSION', '1.0.90');
 define('FRAMT_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('FRAMT_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FRAMT_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -894,19 +894,42 @@ window.onload = function() {
         }
         
         // Save document record to database for "My Documents"
-        $this->save_user_document($user_id, array(
-            'title' => $guide_data['title'],
+        // Use FRAMT_Documents class which properly saves to the database table
+        $documents_handler = FRAMT_Documents::get_instance();
+        $guide_type = $guide_data['type'] ?? 'guide';
+
+        // Get proper title and icon for the guide type
+        $guide_titles = array(
+            'visa-application' => 'Step-by-Step Visa Application Guide',
+            'healthcare' => 'Healthcare Navigation Guide',
+            'banking' => 'Banking Setup Guide',
+            'housing' => 'Housing Search Guide',
+            'relocation-timeline' => 'Relocation Timeline',
+            'bank-ratings' => 'French Bank Comparison Guide',
+            'pet-relocation' => 'Pet Relocation Guide',
+            'french-mortgages' => 'French Mortgage Evaluation Guide',
+            'apostille' => 'Apostille Guide',
+        );
+
+        $doc_id = $documents_handler->save_document(array(
             'type' => 'guide',
-            'guide_type' => $guide_data['type'] ?? '',
-            'file_path' => $file_path,
-            'file_url' => $url,
-            'file_ext' => $file_ext,
-            'created_at' => current_time('mysql'),
-            'expires_at' => date('Y-m-d H:i:s', strtotime('+30 days')),
-        ));
-        
+            'title' => $guide_titles[$guide_type] ?? $guide_data['title'],
+            'content' => array(
+                'file_path' => $file_path,
+                'file_url' => $url,
+                'file_ext' => $file_ext,
+                'guide_type' => $guide_type,
+            ),
+            'meta' => array(
+                'expires_at' => date('Y-m-d H:i:s', strtotime('+30 days')),
+                'ai_generated' => true,
+            ),
+        ), $user_id);
+
         // Schedule cleanup for 30 days
-        wp_schedule_single_event(strtotime('+30 days'), 'framt_cleanup_user_document', array($file_path, $user_id));
+        if ($doc_id) {
+            wp_schedule_single_event(strtotime('+30 days'), 'framt_cleanup_generated_document', array($doc_id, $file_path, $user_id));
+        }
         
         wp_send_json_success(array('url' => $url));
     }
@@ -1387,8 +1410,13 @@ window.onload = function() {
      */
     private function generate_guide_from_chat($guide_type, $answers, $profile) {
         try {
+            $user_id = get_current_user_id();
+
+            // Sync answers back to profile (update empty fields)
+            $this->sync_guide_answers_to_profile($guide_type, $answers, $user_id);
+
             $ai_generator = $this->components['ai_guide_generator'];
-            
+
             // Check if AI is configured
             if ($ai_generator->is_configured()) {
                 $guide_data = $ai_generator->generate_guide($guide_type, $answers, $profile);
@@ -1852,7 +1880,67 @@ window.onload = function() {
             }
         }
     }
-    
+
+    /**
+     * Sync guide chat answers to user profile
+     * Updates profile fields that have the 'profile_field' attribute in guide config
+     */
+    private function sync_guide_answers_to_profile($guide_type, $answers, $user_id) {
+        $guide_configs = $this->get_guide_chat_configs();
+
+        if (!isset($guide_configs[$guide_type])) {
+            return;
+        }
+
+        $config = $guide_configs[$guide_type];
+        $questions = $config['questions'] ?? array();
+        $profile_updates = array();
+
+        // Build mapping from answer keys to profile fields
+        foreach ($questions as $question) {
+            $answer_key = $question['key'] ?? '';
+            $profile_field = $question['profile_field'] ?? '';
+
+            if (empty($answer_key) || empty($profile_field) || !isset($answers[$answer_key])) {
+                continue;
+            }
+
+            $answer_value = $answers[$answer_key];
+
+            // Handle profile_value_map if present (reverse mapping for options)
+            if (!empty($question['profile_value_map'])) {
+                // The map is typically profile_value => chat_value, so we need to reverse
+                $reverse_map = array_flip($question['profile_value_map']);
+                if (isset($reverse_map[$answer_value])) {
+                    $profile_updates[$profile_field] = $reverse_map[$answer_value];
+                } else {
+                    $profile_updates[$profile_field] = $answer_value;
+                }
+            } else {
+                $profile_updates[$profile_field] = $answer_value;
+            }
+        }
+
+        if (empty($profile_updates)) {
+            return;
+        }
+
+        // Get current profile
+        $current_profile = FRAMT_Profile::get_instance()->get_profile($user_id);
+
+        // Only update fields that are empty in the current profile
+        $new_updates = array();
+        foreach ($profile_updates as $field => $value) {
+            if (empty($current_profile[$field])) {
+                $new_updates[$field] = $value;
+            }
+        }
+
+        if (!empty($new_updates)) {
+            FRAMT_Profile::get_instance()->save_profile($new_updates, $user_id);
+        }
+    }
+
     /**
      * Get document chat intro message
      */

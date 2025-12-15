@@ -87,6 +87,11 @@ class FRAMT_Documents {
                 'description' => __('Letter explaining your housing arrangements in France.', 'fra-member-tools'),
                 'icon' => '🏠',
             ),
+            'guide' => array(
+                'title' => __('Personalized Guide', 'fra-member-tools'),
+                'description' => __('AI-generated personalized guide for your relocation.', 'fra-member-tools'),
+                'icon' => '📋',
+            ),
         );
     }
 

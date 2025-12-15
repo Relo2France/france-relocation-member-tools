@@ -2,7 +2,7 @@
  * France Relocation Member Tools - Frontend Styles
  * @package FRA_Member_Tools
  * @since 1.0.0
- * @version 1.0.34
+ * @version 1.0.35
  * 
  * Uses CSS variables from main France Relocation Assistant plugin.
  * Falls back to defaults if main plugin variables not available.
@@ -1481,6 +1481,12 @@
     font-size: 0.9rem;
 }
 
+/* Guide Ready (reuses doc-ready styling) */
+.framt-guide-ready {
+    margin-top: 1rem;
+    margin-left: 48px;
+}
+
 /* My Documents Notice */
 .framt-documents-notice {
     display: flex;
@@ -2857,4 +2863,50 @@
         transform: scale(1);
         opacity: 1;
     }
+}
+
+/* Guide Generating Indicator (matches document generating style) */
+.framt-guide-generating {
+    align-items: flex-start !important;
+}
+
+.framt-guide-generating .framt-generating-message {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #f59e0b;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    animation: generating-pulse 2s infinite;
+}
+
+.framt-guide-generating .framt-generating-icon {
+    font-size: 1.5rem;
+    animation: document-write 1s infinite;
+}
+
+.framt-guide-generating .framt-generating-text {
+    flex: 1;
+}
+
+.framt-guide-generating .framt-generating-text strong {
+    display: block;
+    color: #92400e;
+    font-size: 0.95rem;
+}
+
+.framt-guide-generating .framt-generating-text p {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    color: #a16207;
+}
+
+.framt-guide-generating .framt-generating-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #fbbf24;
+    border-top-color: #92400e;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
