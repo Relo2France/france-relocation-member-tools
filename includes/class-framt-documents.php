@@ -578,15 +578,10 @@ class FRAMT_Documents {
             <div class="framt-documents-header">
                 <h2><?php _e('My Visa Documents', 'fra-member-tools'); ?></h2>
                 <button class="framt-btn framt-btn-primary" data-action="create-document">
-                    <?php _e('+ Create New Document', 'fra-member-tools'); ?>
+                    <?php _e('+ Create New', 'fra-member-tools'); ?>
                 </button>
             </div>
-            
-            <div class="framt-documents-notice">
-                <span class="framt-notice-icon">ℹ️</span>
-                <p><?php _e('Documents are automatically deleted after 60 days. Download and save important documents to your computer before they expire.', 'fra-member-tools'); ?></p>
-            </div>
-            
+
             <?php if (empty($documents)) : ?>
                 <div class="framt-empty-state">
                     <div class="framt-empty-icon">📄</div>
@@ -595,11 +590,11 @@ class FRAMT_Documents {
                 </div>
             <?php else : ?>
                 <div class="framt-documents-list">
-                    <?php foreach ($documents as $doc) : 
+                    <?php foreach ($documents as $doc) :
                         $days = $doc['days_remaining'];
                         $expiry_class = '';
                         $expiry_text = '';
-                        
+
                         if ($days !== null) {
                             if ($days <= 7) {
                                 $expiry_class = 'framt-expiry-urgent';
@@ -637,6 +632,11 @@ class FRAMT_Documents {
                             </div>
                         </div>
                     <?php endforeach; ?>
+                </div>
+
+                <div class="framt-documents-notice">
+                    <span class="framt-notice-icon">ℹ️</span>
+                    <p><?php _e('Documents expire after 60 days. Download important files to your computer.', 'fra-member-tools'); ?></p>
                 </div>
             <?php endif; ?>
         </div>
