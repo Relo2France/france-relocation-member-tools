@@ -1,0 +1,2832 @@
+/**
+ * France Relocation Member Tools - Frontend Styles
+ * @package FRA_Member_Tools
+ * @since 1.0.0
+ * @version 1.0.34
+ * 
+ * Uses CSS variables from main France Relocation Assistant plugin.
+ * Falls back to defaults if main plugin variables not available.
+ * 
+ * Design System: Braun-inspired aesthetic
+ * - Colors: Warm neutrals (#1a1a1a, #fafaf8, #d4a853)
+ * - Typography: System fonts, clean hierarchy
+ * - Spacing: Consistent 8px grid
+ */
+
+:root {
+    /* Fallback colors - main plugin will override these via --fra-* variables */
+    --framt-primary: var(--fra-accent, #ff6b00);
+    --framt-primary-dark: var(--fra-accent-dark, #e55a00);
+    --framt-secondary: var(--fra-primary, #1e3a5f);
+    --framt-success: var(--fra-success, #2e7d32);
+    --framt-warning: var(--fra-warning, #e65100);
+    --framt-danger: var(--fra-danger, #c62828);
+    --framt-gray-100: var(--fra-background, #f5f5f5);
+    --framt-gray-200: var(--fra-border, #e0e0e0);
+    --framt-gray-300: #d0d0d0;
+    --framt-gray-500: var(--fra-text-light, #666666);
+    --framt-gray-700: var(--fra-text, #1a1a1a);
+    --framt-gray-900: #0a0a0a;
+    --framt-radius: 8px;
+    --framt-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --framt-shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+    
+    /* Button colors from main plugin */
+    --framt-btn-primary-bg: var(--fra-btn-primary-bg, #ff6b00);
+    --framt-btn-primary-text: var(--fra-btn-primary-text, #ffffff);
+    --framt-btn-secondary-bg: var(--fra-btn-secondary-bg, #f3f4f6);
+    --framt-btn-secondary-text: var(--fra-btn-secondary-text, #374151);
+}
+
+/* Cards */
+.framt-card {
+    background: var(--fra-card, white);
+    border-radius: var(--framt-radius);
+    box-shadow: var(--framt-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--fra-border, #e8e6e1);
+}
+.framt-card h3 { margin: 0 0 1rem; font-size: 1.1rem; font-weight: 600; }
+
+/* Dashboard - Compact single-column design for chat panel */
+.framt-dashboard { 
+    max-width: 100%; 
+    margin: 0; 
+    padding: 0;
+}
+
+.framt-welcome {
+    background: var(--fra-card, #fafaf8);
+    border: 1px solid var(--fra-border, #e8e6e1);
+    color: var(--fra-text, #1a1a1a); 
+    padding: 1rem 1.25rem; 
+    border-radius: var(--framt-radius); 
+    margin-bottom: 1rem;
+}
+
+.framt-welcome h2 { 
+    margin: 0; 
+    font-size: 1.1rem; 
+    color: var(--fra-text, #1a1a1a); 
+}
+
+/* Cards - Compact styling */
+.framt-dashboard .framt-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.framt-dashboard .framt-card h3 {
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Onboarding CTA in welcome */
+.framt-onboarding-cta {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.75rem;
+    text-align: center;
+}
+
+.framt-onboarding-cta p {
+    margin: 0 0 0.75rem;
+    color: #4b5563;
+    font-size: 0.875rem;
+}
+
+/* Progress - Compact */
+.framt-progress-item { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.framt-progress-item:last-child { margin-bottom: 0; }
+.framt-progress-item label { min-width: 70px; font-size: 0.8125rem; color: var(--framt-gray-700); }
+.framt-progress-bar { flex: 1; height: 6px; background: var(--framt-gray-200); border-radius: 3px; overflow: hidden; }
+.framt-progress-fill { height: 100%; background: var(--framt-btn-primary-bg); transition: width 0.3s; }
+.framt-progress-text { min-width: 40px; font-size: 0.8125rem; color: var(--framt-gray-500); text-align: right; }
+
+/* Next Steps - Compact */
+.framt-steps-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.framt-step-item { 
+    display: grid; 
+    grid-template-columns: auto 1fr auto; 
+    align-items: center; 
+    gap: 0.75rem; 
+    padding: 0.625rem 0.75rem; 
+    background: var(--framt-gray-100); 
+    border-radius: 6px; 
+    border-left: 3px solid var(--framt-gray-300); 
+}
+.framt-step-high { border-left-color: var(--framt-danger); }
+.framt-step-medium { border-left-color: var(--framt-warning); }
+.framt-step-low { border-left-color: var(--framt-success); }
+.framt-step-lead-time { 
+    font-size: 0.75rem; 
+    color: var(--framt-gray-500); 
+    min-width: 40px;
+    white-space: nowrap;
+}
+.framt-step-title { 
+    font-size: 0.8125rem; 
+    white-space: nowrap;
+}
+.framt-step-item .framt-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+}
+/* Stack on narrow screens */
+@media (max-width: 400px) {
+    .framt-step-item {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+    }
+    .framt-step-lead-time {
+        order: -1;
+        font-size: 0.7rem;
+    }
+    .framt-step-title {
+        white-space: normal;
+    }
+}
+
+/* Quick Actions - Compact horizontal scroll */
+.framt-actions-grid { 
+    display: flex; 
+    gap: 0.5rem; 
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+}
+.framt-action-btn { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 0.35rem; 
+    padding: 0.625rem 0.75rem; 
+    min-width: 70px;
+    background: var(--framt-gray-100); 
+    border: none; 
+    border-radius: var(--framt-radius); 
+    cursor: pointer; 
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.framt-action-btn:hover { background: var(--framt-gray-200); transform: translateY(-1px); }
+.framt-action-icon { font-size: 1.25rem; }
+.framt-action-label { font-size: 0.7rem; color: var(--framt-gray-700); text-align: center; line-height: 1.2; }
+
+/* Buttons */
+.framt-btn { 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center;
+    gap: 0.5rem; 
+    padding: 0.6rem 1.2rem; 
+    font-size: 0.9rem; 
+    font-weight: 500; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: all 0.2s; 
+    text-decoration: none;
+    position: relative;
+    z-index: 1;
+}
+.framt-btn-primary { 
+    background: var(--framt-btn-primary-bg); 
+    color: var(--framt-btn-primary-text); 
+}
+.framt-btn-primary:hover { transform: translateY(-1px); box-shadow: var(--framt-shadow); opacity: 0.9; }
+.framt-btn-secondary { 
+    background: var(--framt-btn-secondary-bg); 
+    color: var(--framt-btn-secondary-text); 
+}
+.framt-btn-secondary:hover { background: var(--framt-gray-300); }
+.framt-btn-danger { background: var(--framt-danger); color: white; }
+.framt-btn-small { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+
+/* Documents */
+.framt-documents-list { display: flex; flex-direction: column; gap: 1rem; }
+.framt-document-card { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--fra-card, white); border: 1px solid var(--framt-gray-200); border-radius: var(--framt-radius); }
+.framt-doc-icon { font-size: 2rem; }
+.framt-doc-info { flex: 1; }
+.framt-doc-info strong { display: block; margin-bottom: 0.25rem; }
+.framt-doc-info span { font-size: 0.85rem; color: var(--framt-gray-500); }
+.framt-doc-actions { display: flex; gap: 0.5rem; }
+
+/* Create Documents Page */
+.framt-create-documents { max-width: 800px; margin: 0 auto; }
+.framt-create-header { margin-bottom: 2rem; }
+.framt-create-header h2 { margin: 0 0 0.5rem; color: var(--framt-gray-700); }
+.framt-create-header p { color: var(--framt-gray-500); margin: 0; }
+.framt-doc-types-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+.framt-doc-type-card { 
+    background: var(--fra-card, white); 
+    border: 2px solid var(--framt-gray-200); 
+    border-radius: var(--framt-radius); 
+    padding: 1.5rem; 
+    text-align: center; 
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.framt-doc-type-card:hover { 
+    border-color: var(--framt-btn-primary-bg); 
+    box-shadow: var(--framt-shadow); 
+    transform: translateY(-2px);
+}
+.framt-doc-type-icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; }
+.framt-doc-type-card h3 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--framt-gray-700); }
+.framt-doc-type-card p { margin: 0 0 1rem; font-size: 0.85rem; color: var(--framt-gray-500); line-height: 1.4; }
+
+/* Checklists */
+.framt-checklists { max-width: 800px; margin: 0 auto; }
+.framt-checklists-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.framt-toggle { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; }
+
+/* Help icon popup */
+.framt-toggle {
+    position: relative;
+}
+
+.framt-help-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: var(--framt-gray-200);
+    color: var(--framt-gray-500);
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 4px;
+    border: none;
+    transition: background 0.15s, color 0.15s;
+}
+
+.framt-help-btn:hover,
+.framt-help-btn:focus {
+    background: var(--framt-secondary);
+    color: #fff;
+    outline: none;
+}
+
+.framt-help-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 1000;
+    min-width: 250px;
+    max-width: 300px;
+}
+
+.framt-help-popup-content {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 12px 14px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.framt-help-popup-content::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 12px;
+    width: 12px;
+    height: 12px;
+    background: #1a1a1a;
+    transform: rotate(45deg);
+}
+
+.framt-help-popup-content p {
+    margin: 0 0 10px;
+}
+
+.framt-help-popup-close {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.framt-help-popup-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.framt-checklist-card { background: var(--fra-card, white); border-radius: var(--framt-radius); box-shadow: var(--framt-shadow); padding: 1.5rem; margin-bottom: 1.5rem; }
+.framt-checklist-card h3 { margin: 0 0 1rem; color: var(--framt-gray-700); }
+.framt-checklist-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem; border-bottom: 1px solid var(--framt-gray-200); }
+.framt-checklist-item:last-child { border-bottom: none; }
+.framt-checklist-item.complete { opacity: 0.6; }
+.framt-checklist-item.complete .framt-item-title { text-decoration: line-through; }
+.framt-item-title { flex: 1; }
+.framt-lead-time { font-size: 0.8rem; color: var(--framt-gray-500); min-width: 80px; text-align: right; }
+
+/* Glossary */
+.framt-glossary { max-width: 800px; margin: 0 auto; }
+.framt-glossary-header { margin-bottom: 1.5rem; }
+.framt-glossary-header h2 { margin: 0 0 0.5rem; }
+.framt-glossary-header p { color: var(--framt-gray-500); margin: 0; }
+.framt-glossary-category { margin-bottom: 2rem; }
+.framt-glossary-category h3 { padding-bottom: 0.5rem; border-bottom: 2px solid var(--framt-btn-primary-bg); margin-bottom: 1rem; color: var(--framt-gray-700); font-size: 1.1rem; }
+.framt-term-item { border: 1px solid var(--framt-gray-200); border-radius: var(--framt-radius); margin-bottom: 0.5rem; overflow: hidden; background: var(--fra-card, white); }
+.framt-term-toggle { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 1rem; background: var(--fra-card, white); border: none; cursor: pointer; text-align: left; font-size: 1rem; }
+.framt-term-toggle:hover { background: var(--framt-gray-100); }
+.framt-term-title { font-weight: 500; color: var(--framt-gray-700); }
+.framt-term-content { display: none; padding: 0 1rem 1rem; background: var(--framt-gray-100); }
+.framt-term-content > p { margin: 0 0 0.5rem; color: var(--framt-gray-700); }
+.framt-term-item.active .framt-term-content { display: block; }
+.framt-term-item.active .framt-term-arrow { transform: rotate(180deg); }
+.framt-term-arrow { transition: transform 0.2s ease; color: var(--framt-gray-500); }
+
+/* Glossary Full Term Details */
+.framt-term-full { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--framt-gray-300); }
+.framt-term-section { margin-bottom: 1rem; }
+.framt-term-section:last-child { margin-bottom: 0; }
+.framt-term-section strong { display: block; color: var(--framt-btn-primary-bg); margin-bottom: 0.25rem; font-size: 0.9rem; }
+.framt-term-section p { margin: 0; font-size: 0.9rem; color: var(--framt-gray-700); line-height: 1.5; }
+.framt-term-section ul { margin: 0.5rem 0 0 1.5rem; padding: 0; list-style: disc; }
+.framt-term-section ul li { font-size: 0.9rem; color: var(--framt-gray-700); margin-bottom: 0.25rem; }
+
+/* Guides */
+.framt-guides { max-width: 900px; margin: 0 auto; }
+.framt-guides > h2 { margin: 0 0 0.5rem; }
+.framt-guides > p { color: var(--framt-gray-500); margin: 0 0 1.5rem; }
+.framt-guides-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+.framt-guide-card { 
+    background: var(--fra-card, white); 
+    border-radius: var(--framt-radius); 
+    box-shadow: var(--framt-shadow); 
+    padding: 1.5rem; 
+    text-align: center; 
+    transition: transform 0.2s; 
+    border: 1px solid var(--framt-gray-200);
+}
+.framt-guide-card:hover { transform: translateY(-4px); box-shadow: var(--framt-shadow-lg); }
+.framt-guide-icon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+.framt-guide-card h3 { margin: 0 0 0.5rem; color: var(--framt-gray-700); font-size: 1.1rem; }
+.framt-guide-card p { color: var(--framt-gray-500); font-size: 0.9rem; margin: 0 0 1rem; line-height: 1.4; }
+
+/* Profile Page - Braun Aesthetic */
+.framt-profile { max-width: 800px; margin: 0 auto; }
+.framt-profile-header { 
+    display: flex; 
+    align-items: center; 
+    gap: 1.5rem; 
+    padding: 1.5rem 2rem; 
+    background: #1a1a1a;
+    border-radius: 8px; 
+    margin-bottom: 2rem;
+    color: #fafaf8;
+}
+.framt-profile-avatar { flex-shrink: 0; }
+.framt-profile-avatar img { 
+    border-radius: 50%; 
+    border: 3px solid #d4a853;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+.framt-profile-info { flex: 1; }
+.framt-profile-info h2 { 
+    margin: 0 0 0.25rem; 
+    color: #fafaf8; 
+    font-size: 1.4rem; 
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+.framt-profile-info > p { 
+    margin: 0 0 0.75rem; 
+    color: #a0a0a0;
+    font-size: 0.9rem;
+}
+.framt-profile-completion { display: flex; align-items: center; gap: 1rem; }
+.framt-profile-completion .framt-progress-bar { 
+    flex: 1; 
+    max-width: 200px; 
+    height: 6px; 
+    background: #3a3a3a;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.framt-profile-completion .framt-progress-fill { 
+    background: #d4a853;
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+.framt-profile-completion span { 
+    font-size: 0.85rem; 
+    color: #a0a0a0;
+}
+
+/* Profile Form */
+.framt-profile-form { 
+    background: var(--fra-card, white); 
+    border-radius: var(--framt-radius); 
+    padding: 1.5rem; 
+    box-shadow: var(--framt-shadow);
+}
+.framt-form-section { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--framt-gray-200); }
+.framt-form-section:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.framt-form-section-title { 
+    font-size: 1rem; 
+    font-weight: 600; 
+    color: var(--framt-btn-primary-bg); 
+    margin: 0 0 1rem; 
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--framt-gray-200);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.framt-form-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 1rem; 
+}
+.framt-form-group { margin-bottom: 0; }
+.framt-form-group.full-width { grid-column: 1 / -1; }
+.framt-form-group label { 
+    display: block; 
+    font-size: 0.85rem; 
+    font-weight: 500; 
+    color: var(--framt-gray-700); 
+    margin-bottom: 0.35rem; 
+}
+.framt-form-group input,
+.framt-form-group select,
+.framt-form-group textarea { 
+    width: 100%; 
+    padding: 0.6rem 0.75rem; 
+    border: 1px solid var(--framt-gray-200); 
+    border-radius: 6px; 
+    font-size: 0.95rem; 
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+    box-sizing: border-box;
+}
+.framt-form-group input:focus,
+.framt-form-group select:focus,
+.framt-form-group textarea:focus { 
+    outline: none; 
+    border-color: var(--framt-btn-primary-bg); 
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+.framt-form-group select { 
+    appearance: none; 
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2rem;
+    cursor: pointer;
+}
+.framt-form-actions { 
+    padding-top: 1.5rem; 
+    border-top: 1px solid var(--framt-gray-200); 
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+/* Membership Status */
+.framt-membership-status { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--framt-gray-100); border-radius: var(--framt-radius); margin-top: 1.5rem; }
+
+/* Onboarding */
+.framt-onboarding-prompt, .framt-completion-prompt { background: rgba(255,255,255,0.15); padding: 1rem; border-radius: 6px; margin-top: 1rem; }
+.framt-onboarding-prompt p, .framt-completion-prompt p { margin: 0 0 1rem; }
+
+/* Health Insurance Verification */
+.framt-upload-verify { max-width: 700px; margin: 0 auto; }
+.framt-upload-header { margin-bottom: 1.5rem; }
+.framt-upload-header h2 { margin: 0 0 0.5rem; }
+.framt-upload-header p { color: var(--framt-gray-500); margin: 0; }
+
+.framt-verify-requirements { 
+    background: var(--fra-card, white); 
+    border-radius: var(--framt-radius); 
+    padding: 1.5rem; 
+    margin-bottom: 1.5rem;
+    box-shadow: var(--framt-shadow);
+}
+.framt-verify-requirements h3 { margin: 0 0 1rem; font-size: 1rem; color: var(--framt-gray-700); }
+.framt-requirements-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.framt-requirement-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; background: var(--framt-gray-100); border-radius: 6px; }
+.framt-req-icon { color: var(--framt-success); font-weight: bold; }
+.framt-requirement-item span:last-child { color: var(--framt-gray-700); font-size: 0.9rem; }
+
+.framt-verify-upload-section { margin-bottom: 1.5rem; }
+.framt-upload-card { 
+    background: var(--fra-card, white); 
+    border-radius: var(--framt-radius); 
+    padding: 2rem; 
+    box-shadow: var(--framt-shadow);
+    text-align: center;
+}
+.framt-upload-dropzone { 
+    border: 2px dashed var(--framt-gray-300); 
+    border-radius: var(--framt-radius); 
+    padding: 2rem; 
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.framt-upload-dropzone:hover { 
+    border-color: var(--framt-btn-primary-bg); 
+    background: var(--framt-gray-100);
+}
+.framt-upload-dropzone.drag-over {
+    border-color: var(--framt-btn-primary-bg);
+    background: rgba(255, 107, 0, 0.05);
+}
+.framt-dropzone-icon { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.5; }
+.framt-upload-dropzone h4 { margin: 0 0 0.5rem; color: var(--framt-gray-700); }
+.framt-upload-dropzone p { margin: 0 0 0.5rem; color: var(--framt-gray-500); font-size: 0.9rem; }
+.framt-file-types { font-size: 0.8rem !important; color: var(--framt-gray-500) !important; margin-bottom: 1rem !important; }
+
+.framt-upload-progress-container { padding: 1rem; }
+.framt-upload-progress-bar { height: 8px; background: var(--framt-gray-200); border-radius: 4px; overflow: hidden; }
+.framt-upload-progress-fill { height: 100%; background: var(--framt-btn-primary-bg); width: 0%; transition: width 0.3s; }
+.framt-upload-status-text { margin: 0.5rem 0 0; color: var(--framt-gray-500); font-size: 0.9rem; }
+
+.framt-analyzing { padding: 2rem; }
+.framt-spinner { 
+    width: 40px; 
+    height: 40px; 
+    border: 3px solid var(--framt-gray-200); 
+    border-top-color: var(--framt-btn-primary-bg); 
+    border-radius: 50%; 
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.framt-analyzing p { margin: 0; color: var(--framt-gray-500); }
+
+/* Verification Results */
+.framt-verification-result { 
+    background: var(--fra-card, white); 
+    border-radius: var(--framt-radius); 
+    padding: 1.5rem; 
+    box-shadow: var(--framt-shadow);
+}
+.framt-verification-result.verified { border-left: 4px solid var(--framt-success); }
+.framt-verification-result.issues { border-left: 4px solid var(--framt-warning); }
+.framt-verification-result.failed { border-left: 4px solid var(--framt-danger); }
+.framt-result-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.framt-result-icon { font-size: 1.5rem; }
+.framt-result-header h4 { margin: 0; color: var(--framt-gray-700); }
+.framt-result-findings { 
+    background: var(--framt-gray-100); 
+    padding: 1rem; 
+    border-radius: 6px; 
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+.framt-result-findings ul { margin: 0.5rem 0 0 1.5rem; padding: 0; }
+.framt-result-findings li { margin-bottom: 0.25rem; }
+.framt-result-actions { padding-top: 1rem; border-top: 1px solid var(--framt-gray-200); }
+
+.framt-verify-info { 
+    background: var(--framt-gray-100); 
+    border-radius: var(--framt-radius); 
+    padding: 1rem 1.5rem;
+}
+.framt-verify-info h4 { margin: 0 0 0.75rem; font-size: 0.95rem; color: var(--framt-gray-700); }
+.framt-verify-info ul { margin: 0; padding-left: 1.25rem; }
+.framt-verify-info li { color: var(--framt-gray-500); font-size: 0.9rem; margin-bottom: 0.35rem; }
+
+/* Empty States */
+.framt-empty-state { text-align: center; padding: 3rem; background: var(--framt-gray-100); border-radius: var(--framt-radius); }
+.framt-empty-icon { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.5; }
+.framt-empty-state h3 { margin: 0 0 0.5rem; color: var(--framt-gray-700); }
+.framt-empty-state p { margin: 0 0 1rem; color: var(--framt-gray-500); }
+
+/* Loading */
+.fra-loading { text-align: center; padding: 2rem; color: var(--framt-gray-500); }
+
+/* AI Findings Styles */
+.framt-ai-findings { margin-top: 0.5rem; }
+.framt-ai-findings h5 { 
+    margin: 1rem 0 0.5rem; 
+    font-size: 0.9rem; 
+    color: var(--framt-gray-700);
+    font-weight: 600;
+}
+.framt-ai-findings h5:first-child { margin-top: 0; }
+.framt-checklist-results { 
+    list-style: none; 
+    margin: 0; 
+    padding: 0;
+}
+.framt-checklist-results li { 
+    padding: 0.5rem 0.75rem; 
+    margin-bottom: 0.25rem; 
+    background: var(--framt-gray-100); 
+    border-radius: 4px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+.framt-checklist-results li.framt-check-met { background: #f0fff4; }
+.framt-checklist-results li.framt-check-not_met { background: #fff5f5; }
+.framt-checklist-results li.framt-check-unclear { background: #fffbeb; }
+.framt-check-icon { margin-right: 0.5rem; }
+.framt-findings-text, .framt-recommendations-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--framt-gray-700);
+}
+.framt-ai-disclaimer { 
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--framt-gray-100);
+    border-left: 3px solid var(--framt-warning);
+    border-radius: 0 4px 4px 0;
+    font-size: 0.8rem;
+}
+.framt-ai-disclaimer p { margin: 0; color: var(--framt-gray-600); }
+
+/* Guide Detail Styles */
+.framt-guide-detail { max-width: 800px; margin: 0 auto; }
+.framt-guide-header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--framt-gray-200); }
+.framt-guide-icon-large { font-size: 3rem; display: block; margin-bottom: 1rem; }
+.framt-guide-header h2 { margin: 0 0 0.5rem; color: var(--framt-gray-700); }
+.framt-guide-header p { margin: 0; color: var(--framt-gray-500); }
+.framt-guide-section { margin-bottom: 2rem; }
+.framt-guide-section h3 { color: var(--framt-primary); margin: 0 0 1rem; font-size: 1.1rem; }
+.framt-guide-section p { line-height: 1.7; color: var(--framt-gray-700); }
+.framt-guide-section ul, .framt-guide-section ol { margin: 0.5rem 0 0 1.5rem; padding: 0; }
+.framt-guide-section li { margin-bottom: 0.5rem; line-height: 1.6; color: var(--framt-gray-700); }
+.framt-personalized { background: linear-gradient(135deg, rgba(255, 107, 0, 0.05), rgba(30, 58, 95, 0.05)); padding: 1.5rem; border-radius: var(--framt-radius); border: 1px solid var(--framt-primary); }
+.framt-state-card { background: var(--fra-card, white); padding: 1rem 1.5rem; border-radius: var(--framt-radius); margin-bottom: 1rem; box-shadow: var(--framt-shadow); }
+.framt-state-card h4 { margin: 0 0 0.75rem; color: var(--framt-secondary); }
+.framt-state-card ul { margin: 0 0 1rem; }
+.framt-tip { background: var(--framt-gray-100); padding: 1rem; border-radius: var(--framt-radius); font-style: italic; }
+.framt-bank-ratings { display: grid; gap: 1rem; }
+.framt-bank-card { background: var(--fra-card, white); padding: 1.25rem; border-radius: var(--framt-radius); box-shadow: var(--framt-shadow); }
+.framt-bank-card h4 { margin: 0 0 0.75rem; color: var(--framt-primary); }
+.framt-bank-card p { margin: 0 0 0.5rem; font-size: 0.9rem; line-height: 1.5; }
+.framt-bank-card p:last-child { margin: 0; }
+
+/* Document Creation Styles */
+.framt-doc-creation { max-width: 700px; margin: 0 auto; }
+.framt-doc-creation-header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--framt-gray-200); }
+.framt-doc-creation-icon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+.framt-doc-creation-header h2 { margin: 0 0 0.5rem; color: var(--framt-gray-700); }
+.framt-doc-creation-header p { margin: 0; color: var(--framt-gray-500); }
+.framt-profile-summary-card { background: var(--framt-gray-100); padding: 1rem 1.5rem; border-radius: var(--framt-radius); margin-bottom: 1.5rem; }
+.framt-profile-summary-card h4 { margin: 0 0 0.75rem; font-size: 0.9rem; color: var(--framt-gray-700); }
+.framt-profile-summary-card ul { margin: 0; padding: 0; list-style: none; }
+.framt-profile-summary-card li { padding: 0.25rem 0; font-size: 0.9rem; color: var(--framt-gray-600); }
+.framt-doc-questions { background: var(--fra-card, white); padding: 1.5rem; border-radius: var(--framt-radius); box-shadow: var(--framt-shadow); }
+.framt-question label { display: block; font-weight: 500; margin-bottom: 1rem; color: var(--framt-gray-700); line-height: 1.5; }
+.framt-choice-options { display: flex; flex-direction: column; gap: 0.5rem; }
+.framt-choice-btn { text-align: left; justify-content: flex-start; }
+.framt-doc-input { width: 100%; padding: 0.75rem; border: 1px solid var(--framt-gray-300); border-radius: var(--framt-radius); font-size: 1rem; resize: vertical; }
+.framt-progress-msg { color: var(--framt-gray-500); font-size: 0.9rem; margin-bottom: 1rem; font-style: italic; }
+.framt-generate-ready { text-align: center; padding: 1rem; }
+.framt-generate-ready h3 { margin: 0 0 0.5rem; color: var(--framt-success); }
+.framt-generate-ready p { margin: 0 0 1.5rem; color: var(--framt-gray-500); }
+.framt-btn-large { padding: 1rem 2rem; font-size: 1.1rem; }
+
+/* Document Preview */
+.framt-doc-preview { max-width: 700px; margin: 0 auto; }
+.framt-preview-header { text-align: center; margin-bottom: 1.5rem; }
+.framt-preview-header h2 { margin: 0 0 0.5rem; color: var(--framt-success); }
+.framt-preview-actions { display: flex; gap: 1rem; justify-content: center; margin-bottom: 1.5rem; }
+.framt-preview-content h4 { margin: 0 0 0.75rem; color: var(--framt-gray-700); }
+.framt-preview-box { background: var(--framt-gray-100); padding: 1.5rem; border-radius: var(--framt-radius); font-family: serif; line-height: 1.8; white-space: pre-wrap; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .framt-document-card { flex-direction: column; text-align: center; }
+    .framt-doc-actions { flex-wrap: wrap; justify-content: center; }
+    .framt-checklists-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    .framt-profile-header { flex-direction: column; text-align: center; }
+    .framt-profile-completion { justify-content: center; }
+    .framt-form-grid { grid-template-columns: 1fr; }
+    .framt-doc-types-grid { grid-template-columns: 1fr; }
+    .framt-guides-grid { grid-template-columns: 1fr; }
+    .framt-upload-dropzone { padding: 1.5rem; }
+}
+
+/* Guide Generation Styles */
+.framt-guide-generator { max-width: 700px; margin: 0 auto; }
+.framt-guide-gen-header { text-align: center; margin-bottom: 2rem; }
+.framt-guide-gen-header h2 { margin: 0 0 0.5rem; color: var(--framt-gray-700); }
+.framt-guide-gen-header p { margin: 0; color: var(--framt-gray-500); }
+
+.framt-guide-progress { margin-bottom: 2rem; }
+.framt-progress-bar { height: 8px; background: var(--framt-gray-200); border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem; }
+.framt-progress-fill { height: 100%; background: var(--framt-primary); transition: width 0.3s ease; }
+.framt-guide-progress span { font-size: 0.85rem; color: var(--framt-gray-500); }
+
+.framt-guide-questions { background: var(--fra-card, white); padding: 2rem; border-radius: var(--framt-radius); box-shadow: var(--framt-shadow); }
+.framt-question-card h3 { margin: 0 0 1.5rem; color: var(--framt-gray-700); line-height: 1.4; }
+
+.framt-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--framt-gray-300); border-radius: var(--framt-radius); font-size: 1rem; margin-bottom: 1rem; }
+.framt-input:focus { outline: none; border-color: var(--framt-primary); box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15); }
+
+.framt-multi-choice { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+.framt-checkbox-label { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--framt-gray-100); border-radius: var(--framt-radius); cursor: pointer; transition: background 0.2s; }
+.framt-checkbox-label:hover { background: var(--framt-gray-200); }
+.framt-checkbox-label input { width: 18px; height: 18px; }
+
+/* Generated Guide */
+.framt-generated-guide { max-width: 800px; margin: 0 auto; }
+.framt-guide-success { text-align: center; padding: 2rem; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: var(--framt-radius); margin-bottom: 2rem; }
+.framt-success-icon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+.framt-guide-success h2 { margin: 0 0 0.5rem; color: var(--framt-success); }
+.framt-guide-success p { margin: 0; color: var(--framt-gray-600); }
+
+.framt-guide-download-actions { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+.framt-btn-large { padding: 1rem 2rem; font-size: 1.1rem; }
+
+.framt-guide-preview { background: var(--fra-card, white); padding: 2rem; border-radius: var(--framt-radius); box-shadow: var(--framt-shadow); }
+.framt-guide-preview h3 { margin: 0 0 1rem; color: var(--framt-gray-700); }
+
+.framt-preview-doc { background: white; border: 1px solid var(--framt-gray-200); padding: 2rem; border-radius: var(--framt-radius); font-family: Georgia, serif; }
+.framt-preview-doc h2 { font-size: 1.5rem; color: #1a1a2e; border-bottom: 2px solid #c9a227; padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
+.framt-preview-subtitle { color: var(--framt-gray-600); margin-bottom: 0.25rem !important; }
+.framt-preview-date { color: var(--framt-gray-400); font-size: 0.9rem; margin-bottom: 1.5rem !important; }
+.framt-preview-summary { background: #f5f7fa; padding: 1rem; border-radius: var(--framt-radius); margin-bottom: 1.5rem; }
+.framt-preview-summary div { padding: 0.25rem 0; }
+.framt-preview-more { font-style: italic; color: var(--framt-gray-400); margin-top: 1rem; }
+
+.framt-guide-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+
+/* Welcome Chat Styles - Compact for chat panel */
+.framt-welcome-chat { 
+    padding: 0; 
+    max-width: 100%; 
+    margin: 0 0 1rem 0; 
+}
+
+/* Profile reminder specific styling */
+.framt-profile-reminder {
+    background: var(--fra-card, #fafaf8);
+    border: 1px solid var(--fra-border, #e8e6e1);
+    border-radius: 10px;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.framt-profile-reminder .framt-chat-message {
+    margin-bottom: 0;
+    padding: 1rem;
+    gap: 0.75rem;
+}
+
+.framt-profile-reminder .framt-chat-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+}
+
+.framt-profile-reminder .framt-chat-bubble {
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.framt-profile-reminder .framt-chat-bubble p {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.framt-profile-reminder .framt-chat-bubble p:first-child {
+    font-size: 0.95rem;
+}
+
+.framt-profile-reminder .framt-welcome-actions {
+    padding: 0 1rem 1rem;
+    margin-top: 0;
+    padding-left: calc(36px + 1.75rem); /* Align with bubble */
+    gap: 0.5rem;
+}
+
+.framt-profile-reminder .framt-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.framt-chat-message { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.framt-chat-avatar { 
+    width: 44px; 
+    height: 44px; 
+    border-radius: 50%; 
+    background: var(--fra-background, #f5f5f0);
+    border: 2px solid var(--fra-border, #e0e0e0);
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 1.25rem; 
+    flex-shrink: 0; 
+}
+.framt-chat-bubble { 
+    background: var(--fra-card, #fafaf8); 
+    padding: 1.25rem 1.5rem; 
+    border-radius: 12px; 
+    border: 1px solid var(--fra-border, #e8e6e1);
+    flex: 1; 
+}
+.framt-chat-bubble p { margin: 0 0 1rem; line-height: 1.6; color: var(--fra-text, #333); }
+.framt-chat-bubble p:last-child { margin-bottom: 0; }
+.framt-chat-bubble ul { margin: 1rem 0; padding-left: 0; list-style: none; }
+.framt-chat-bubble li { 
+    padding: 0.75rem 1rem; 
+    margin-bottom: 0.5rem; 
+    background: var(--fra-background, #f5f5f0); 
+    border-left: 3px solid var(--fra-accent, #d4a853); 
+    border-radius: 0 6px 6px 0; 
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+.framt-chat-bubble strong { color: var(--fra-text, #1a1a1a); }
+.framt-chat-bubble em { color: var(--fra-text-light, #666); font-size: 0.9rem; }
+
+.framt-welcome-actions { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 0.75rem; 
+    margin-top: 1.5rem; 
+    padding-left: 60px; 
+}
+.framt-welcome-actions .framt-btn-large { padding: 1rem 1.5rem; font-size: 1rem; }
+
+/* Onboarding CTA */
+/* Onboarding CTA - Braun aesthetic */
+.framt-onboarding-cta { 
+    background: var(--fra-background, #f5f5f0); 
+    padding: 1.5rem 2rem; 
+    border-radius: var(--framt-radius); 
+    margin-top: 1rem; 
+    text-align: center; 
+    border: 1px solid var(--fra-border, #e0e0e0); 
+}
+.framt-onboarding-message { margin-bottom: 1rem; }
+.framt-onboarding-message p { margin: 0; color: var(--fra-text, #333); font-size: 1.05rem; }
+
+/* Subtle pulse animation */
+.framt-pulse { animation: framt-pulse 2.5s ease-in-out infinite; }
+@keyframes framt-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1); }
+    50% { box-shadow: 0 0 0 8px rgba(0, 0, 0, 0); }
+}
+
+/* AI Guide Generation Styles */
+.framt-generating-guide {
+    text-align: center;
+    padding: 4rem 2rem;
+    max-width: 500px;
+    margin: 2rem auto;
+}
+.framt-generating-animation {
+    margin-bottom: 2rem;
+}
+.framt-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid var(--fra-border, #e0e0e0);
+    border-top-color: var(--fra-accent, #d4a853);
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: framt-spin 1s linear infinite;
+}
+@keyframes framt-spin {
+    to { transform: rotate(360deg); }
+}
+.framt-generating-guide h2 {
+    margin: 0 0 1rem;
+    color: var(--fra-text, #1a1a1a);
+    font-weight: 500;
+}
+.framt-generating-guide p {
+    margin: 0 0 0.5rem;
+    color: var(--fra-text-light, #666);
+}
+.framt-generating-note {
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* AI Badge */
+.framt-ai-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #92400e;
+    padding: 0.35rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+
+/* Notifications */
+.framt-notification {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    animation: framt-slide-down 0.3s ease;
+}
+
+@keyframes framt-slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.framt-notification-success {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    color: #166534;
+}
+
+.framt-notification-error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+}
+
+.framt-notification-fade {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Profile form improvements */
+.framt-profile-form .framt-form-section {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e8e6e1;
+}
+
+.framt-profile-form .framt-form-section:last-of-type {
+    border-bottom: none;
+}
+
+.framt-profile-form .framt-form-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: #1a1a1a;
+}
+
+.framt-profile-form .framt-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.framt-profile-form .framt-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.framt-profile-form .framt-form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #4a4a4a;
+}
+
+.framt-profile-form input[type="text"],
+.framt-profile-form input[type="date"],
+.framt-profile-form input[type="number"],
+.framt-profile-form select,
+.framt-profile-form textarea {
+    padding: 10px 12px;
+    border: 1px solid #e8e6e1;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #1a1a1a;
+    background: #fafaf8;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.framt-profile-form input:focus,
+.framt-profile-form select:focus,
+.framt-profile-form textarea:focus {
+    outline: none;
+    border-color: #d4a853;
+    box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.1);
+}
+
+.framt-profile-form .framt-form-actions {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e8e6e1;
+}
+
+.framt-profile-form button[type="submit"] {
+    background: #1a1a1a;
+    color: #fafaf8;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.framt-profile-form button[type="submit"]:hover {
+    background: #2a2a2a;
+}
+
+.framt-profile-form button[type="submit"]:disabled {
+    background: #6b6b6b;
+    cursor: not-allowed;
+}
+
+/* Document Creation Flow */
+.framt-document-flow {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.framt-doc-flow-header {
+    margin-bottom: 2rem;
+}
+
+.framt-doc-flow-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.framt-doc-flow-header p {
+    color: #666;
+    margin: 0;
+}
+
+.framt-doc-profile-summary {
+    background: #f9f9f7;
+    border: 1px solid #e8e6e1;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.framt-doc-profile-summary h4 {
+    margin: 0 0 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #4a4a4a;
+}
+
+.framt-profile-values {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.framt-profile-value {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.framt-value-label {
+    color: #666;
+}
+
+.framt-value-text {
+    color: #1a1a1a;
+    font-weight: 500;
+}
+
+.framt-doc-question {
+    background: white;
+    border: 1px solid #e8e6e1;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.framt-doc-question h3 {
+    margin: 0 0 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.framt-doc-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.framt-doc-option {
+    display: block;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: #fafaf8;
+    border: 1px solid #e8e6e1;
+    border-radius: 6px;
+    text-align: left;
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.framt-doc-option:hover {
+    background: #f5f5f0;
+    border-color: #d4a853;
+}
+
+.framt-doc-text-input {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.framt-doc-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e8e6e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.framt-doc-input:focus {
+    outline: none;
+    border-color: #d4a853;
+    box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.1);
+}
+
+/* Document Chat Interface */
+.framt-doc-chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: calc(100vh - 200px);
+    min-height: 500px;
+}
+
+.framt-doc-chat-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e8e6e1;
+    background: #fafaf8;
+}
+
+.framt-doc-chat-header h2 {
+    margin: 0.75rem 0 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.framt-doc-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.framt-doc-chat-message {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 85%;
+}
+
+.framt-doc-chat-ai {
+    align-self: flex-start;
+}
+
+.framt-doc-chat-user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.framt-doc-chat-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.framt-doc-chat-user .framt-doc-chat-avatar {
+    background: #d4a853;
+}
+
+.framt-doc-chat-bubble {
+    background: #f5f5f0;
+    padding: 0.875rem 1.125rem;
+    border-radius: 12px;
+    border-top-left-radius: 4px;
+}
+
+.framt-doc-chat-user .framt-doc-chat-bubble {
+    background: #1a1a1a;
+    color: #fafaf8;
+    border-radius: 12px;
+    border-top-right-radius: 4px;
+}
+
+.framt-doc-chat-bubble p {
+    margin: 0 0 0.5rem;
+}
+
+.framt-doc-chat-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+.framt-doc-chat-bubble strong {
+    font-weight: 600;
+}
+
+/* Chat Options */
+.framt-doc-chat-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-left: 48px;
+    margin-top: 0.5rem;
+}
+
+.framt-doc-chat-option {
+    padding: 0.625rem 1rem;
+    background: white;
+    border: 1px solid #e8e6e1;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.framt-doc-chat-option:hover:not(:disabled) {
+    background: #f5f5f0;
+    border-color: #d4a853;
+}
+
+.framt-doc-chat-option:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.framt-doc-chat-option.selected {
+    background: #1a1a1a;
+    color: #fafaf8;
+    border-color: #1a1a1a;
+}
+
+/* Chat Input */
+.framt-doc-chat-input-area {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e8e6e1;
+    background: white;
+}
+
+.framt-doc-chat-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e8e6e1;
+    border-radius: 24px;
+    font-size: 0.95rem;
+    background: #fafaf8;
+}
+
+.framt-doc-chat-input:focus {
+    outline: none;
+    border-color: #d4a853;
+    box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.1);
+}
+
+#framt-doc-chat-send {
+    border-radius: 24px;
+    padding: 0.75rem 1.5rem;
+}
+
+/* Typing Indicator */
+.framt-doc-chat-loading {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.framt-typing-indicator {
+    display: inline-flex;
+    padding: 0.75rem 1rem;
+    background: #f5f5f0;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+    animation: typing-pulse 1.4s infinite;
+}
+
+@keyframes typing-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
+/* Document Ready */
+.framt-doc-ready {
+    margin-top: 1rem;
+    margin-left: 48px;
+}
+
+.framt-doc-ready-content {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 1px solid #86efac;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.framt-doc-ready h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    color: #166534;
+}
+
+.framt-doc-ready p {
+    margin: 0 0 1rem;
+    color: #15803d;
+}
+
+.framt-doc-ready-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.framt-doc-ready-actions .framt-btn {
+    min-width: 160px;
+}
+
+/* Generating Document Indicator */
+.framt-doc-generating {
+    align-items: flex-start !important;
+}
+
+.framt-generating-message {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #f59e0b;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    animation: generating-pulse 2s infinite;
+}
+
+@keyframes generating-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+}
+
+.framt-generating-icon {
+    font-size: 1.5rem;
+    animation: document-write 1s infinite;
+}
+
+@keyframes document-write {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.framt-generating-text {
+    flex: 1;
+}
+
+.framt-generating-text strong {
+    display: block;
+    color: #92400e;
+    font-size: 0.95rem;
+}
+
+.framt-generating-text p {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    color: #a16207;
+}
+
+.framt-generating-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #fbbf24;
+    border-top-color: #92400e;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Document Ready Secondary Actions */
+.framt-doc-ready-note {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+.framt-doc-ready-secondary {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #d1fae5;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.framt-doc-ready-secondary .framt-btn {
+    font-size: 0.9rem;
+}
+
+/* My Documents Notice */
+.framt-documents-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.framt-notice-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.framt-documents-notice p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #92400e;
+    line-height: 1.4;
+}
+
+/* Document Meta Row */
+.framt-document-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.framt-document-date {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* Document Expiry Badge */
+.framt-document-expiry {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.framt-expiry-normal {
+    background: #e5e7eb;
+    color: #4b5563;
+}
+
+.framt-expiry-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.framt-expiry-urgent {
+    background: #fee2e2;
+    color: #dc2626;
+    animation: pulse-urgent 2s infinite;
+}
+
+@keyframes pulse-urgent {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Document Action Buttons */
+.framt-document-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.framt-doc-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.framt-doc-action-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.framt-doc-download {
+    color: #059669;
+}
+
+.framt-doc-download:hover {
+    background: #ecfdf5;
+    border-color: #059669;
+    color: #047857;
+}
+
+.framt-doc-delete {
+    color: #9ca3af;
+}
+
+.framt-doc-delete:hover {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #dc2626;
+}
+
+/* =====================================================
+   HEALTH INSURANCE VERIFICATION CHAT STYLES
+   ===================================================== */
+
+.framt-health-verify-chat {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.framt-health-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--framt-gray-200);
+}
+
+.framt-health-header-content h2 {
+    margin: 0 0 0.5rem;
+    color: var(--framt-gray-700);
+}
+
+.framt-health-header-content p {
+    margin: 0;
+    color: var(--framt-gray-500);
+}
+
+.framt-health-header-actions {
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+.framt-health-header-actions .framt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.framt-health-requirements-card {
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border: 1px solid #86efac;
+    border-radius: var(--framt-radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.framt-health-requirements-card h4 {
+    margin: 0 0 1rem;
+    color: #166534;
+    font-size: 1rem;
+}
+
+.framt-requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.5rem;
+}
+
+.framt-req-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--framt-gray-700);
+}
+
+.framt-req-check {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.framt-health-chat-container {
+    background: var(--fra-card, white);
+    border-radius: var(--framt-radius);
+    box-shadow: var(--framt-shadow);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.framt-health-chat-messages {
+    max-height: 650px;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.framt-health-chat-message {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.framt-health-chat-ai {
+    flex-direction: row;
+}
+
+.framt-health-chat-user {
+    flex-direction: row-reverse;
+}
+
+.framt-health-chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    background: var(--framt-gray-100);
+}
+
+.framt-health-chat-ai .framt-health-chat-avatar {
+    background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+}
+
+.framt-health-chat-user .framt-health-chat-avatar {
+    background: var(--framt-primary);
+    color: white;
+    font-size: 0.9rem;
+}
+
+.framt-health-chat-bubble {
+    flex: 1;
+    max-width: 85%;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    line-height: 1.6;
+}
+
+.framt-health-chat-ai .framt-health-chat-bubble {
+    background: var(--framt-gray-100);
+    border-top-left-radius: 4px;
+}
+
+.framt-health-chat-user .framt-health-chat-bubble {
+    background: var(--framt-primary);
+    color: white;
+    border-top-right-radius: 4px;
+}
+
+.framt-health-chat-bubble p {
+    margin: 0 0 0.75rem;
+}
+
+.framt-health-chat-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+/* Health Status Badges */
+.framt-health-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.framt-health-status-verified {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.framt-health-status-issues {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.framt-health-status-failed {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.framt-status-icon {
+    font-size: 1.1rem;
+}
+
+/* Health Checklist */
+.framt-health-checklist {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.framt-health-checklist h5 {
+    margin: 0 0 0.75rem;
+    font-size: 0.9rem;
+    color: var(--framt-gray-700);
+}
+
+.framt-health-check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--framt-gray-100);
+}
+
+.framt-health-check-item:last-child {
+    border-bottom: none;
+}
+
+.framt-health-check-item .framt-check-icon {
+    font-size: 1rem;
+    margin-top: 2px;
+}
+
+.framt-health-check-item.framt-check-met .framt-check-icon { color: #16a34a; }
+.framt-health-check-item.framt-check-not_met .framt-check-icon { color: #dc2626; }
+.framt-health-check-item.framt-check-unclear .framt-check-icon { color: #d97706; }
+
+.framt-check-content {
+    flex: 1;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.framt-check-content strong {
+    color: var(--framt-gray-700);
+}
+
+/* Health Findings */
+.framt-health-findings {
+    margin: 1rem 0;
+}
+
+.framt-health-findings h5 {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    color: var(--framt-gray-700);
+}
+
+.framt-findings-content {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--framt-gray-600);
+}
+
+/* Health Disclaimer */
+.framt-health-disclaimer {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    padding: 0.75rem 1rem;
+    border-radius: 0 6px 6px 0;
+    margin-top: 1rem;
+}
+
+.framt-health-disclaimer p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #92400e;
+}
+
+.framt-health-followup-prompt {
+    margin-top: 1rem;
+    color: var(--framt-primary);
+    font-weight: 500;
+}
+
+/* Health Upload Area */
+.framt-health-upload-area {
+    border-top: 1px solid var(--framt-gray-200);
+    padding: 1.5rem;
+}
+
+.framt-health-dropzone {
+    border: 2px dashed var(--framt-gray-300);
+    border-radius: var(--framt-radius);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.framt-health-dropzone:hover,
+.framt-health-dropzone.drag-over {
+    border-color: var(--framt-primary);
+    background: rgba(255, 107, 0, 0.05);
+}
+
+.framt-dropzone-content {
+    pointer-events: none;
+}
+
+.framt-dropzone-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.framt-health-dropzone h4 {
+    margin: 0 0 0.5rem;
+    color: var(--framt-gray-700);
+}
+
+.framt-health-dropzone p {
+    margin: 0;
+    color: var(--framt-gray-500);
+}
+
+.framt-health-dropzone .framt-file-types {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--framt-gray-400);
+}
+
+.framt-health-dropzone .framt-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.framt-dropzone-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+/* Analyzing Indicator */
+.framt-health-analyzing {
+    text-align: center;
+    padding: 2rem;
+}
+
+.framt-health-analyzing-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.framt-health-analyzing p {
+    margin: 0;
+    color: var(--framt-gray-700);
+    font-weight: 500;
+}
+
+.framt-analyzing-hint {
+    font-size: 0.85rem;
+    color: var(--framt-gray-500);
+}
+
+/* Health Chat Input */
+.framt-health-chat-input-area {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--framt-gray-200);
+    background: var(--framt-gray-50);
+}
+
+.framt-health-chat-input-area input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--framt-gray-300);
+    border-radius: 20px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.framt-health-chat-input-area input:focus {
+    border-color: var(--framt-primary);
+}
+
+.framt-health-chat-input-area .framt-btn {
+    border-radius: 20px;
+    padding: 0.75rem 1.5rem;
+}
+
+/* Typing Indicator */
+.framt-typing-indicator {
+    animation: typing 1.4s infinite;
+}
+
+@keyframes typing {
+    0%, 60%, 100% { opacity: 0.3; }
+    30% { opacity: 1; }
+}
+
+/* Health Tips Card */
+.framt-health-tips-card {
+    background: var(--framt-gray-50);
+    border: 1px solid var(--framt-gray-200);
+    border-radius: var(--framt-radius);
+    padding: 1.25rem 1.5rem;
+}
+
+.framt-health-tips-card h4 {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    color: var(--framt-gray-700);
+}
+
+.framt-health-tips-card ul {
+    margin: 0;
+    padding: 0 0 0 1.25rem;
+}
+
+.framt-health-tips-card li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--framt-gray-600);
+    line-height: 1.5;
+}
+
+.framt-health-tips-card li:last-child {
+    margin-bottom: 0;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+    .framt-health-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .framt-health-header-actions {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .framt-health-header-actions .framt-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .framt-requirements-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .framt-health-chat-bubble {
+        max-width: 90%;
+    }
+}
+
+/* Compact disclaimer text */
+.framt-health-disclaimer-text {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--framt-gray-500);
+}
+
+/* Health Actions (Clear button at bottom of results) */
+.framt-health-actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--framt-gray-200);
+}
+
+.framt-health-actions .framt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.framt-health-actions .framt-btn svg {
+    flex-shrink: 0;
+}
+
+/* Inline tips below upload dropzone */
+.framt-health-tips-inline {
+    text-align: center;
+    padding: 0.75rem 1rem;
+    color: var(--framt-gray-500);
+    font-size: 0.9rem;
+}
+
+.framt-health-tips-inline p {
+    margin: 0;
+}
+
+/* =============================================================================
+   PROFILE PRE-FILL NOTICE
+   Shown once when profile is auto-populated from registration data
+   ============================================================================= */
+
+.framt-prefill-notice {
+    background: linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%);
+    border: 1px solid #a5b4fc;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.framt-prefill-notice-content {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.framt-prefill-icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.framt-prefill-notice h3 {
+    color: #1e3a5f;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.framt-prefill-notice p {
+    color: #4b5563;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+}
+
+.framt-prefill-dismiss {
+    background: #1e3a5f;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.framt-prefill-dismiss:hover {
+    background: #0f2744;
+}
+
+/* =============================================
+   MESSAGES / SUPPORT TICKET SYSTEM
+   ============================================= */
+
+.framt-messages-frontend {
+    padding: 1.5rem;
+}
+
+.framt-messages-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.framt-messages-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #1e3a5f;
+}
+
+/* Support scope notice */
+.framt-messages-notice {
+    display: flex;
+    gap: 0.75rem;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-left: 4px solid #0284c7;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.framt-notice-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.framt-notice-content {
+    font-size: 0.875rem;
+    color: #0c4a6e;
+    line-height: 1.5;
+}
+
+.framt-notice-content strong {
+    color: #0369a1;
+}
+
+.framt-notice-disclaimer {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.8125rem;
+    color: #64748b;
+}
+
+.framt-compose-btn {
+    background: #e85a1b !important;
+}
+
+/* Inbox list */
+.framt-inbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.framt-message-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+}
+
+.framt-message-item:hover {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+}
+
+.framt-message-item.unread {
+    background: #fff8e5;
+    border-left: 3px solid #e85a1b;
+}
+
+.framt-message-item.unread .framt-message-subject {
+    font-weight: 600;
+}
+
+.framt-message-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.framt-message-item.unread .framt-message-icon {
+    background: #fef3cd;
+}
+
+.framt-message-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.framt-message-subject {
+    color: #1e3a5f;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.framt-message-meta {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.framt-message-status {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.framt-message-status.open {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.framt-message-status.closed {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.framt-message-preview {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Empty state */
+.framt-inbox-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+}
+
+.framt-inbox-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Compose form */
+.framt-compose-view,
+.framt-message-view {
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.framt-compose-header,
+.framt-message-header {
+    margin-bottom: 1.5rem;
+}
+
+.framt-back-to-inbox {
+    background: none;
+    border: none;
+    color: #1e3a5f;
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0;
+}
+
+.framt-back-to-inbox:hover {
+    text-decoration: underline;
+}
+
+.framt-compose-form .framt-form-group {
+    margin-bottom: 1rem;
+}
+
+.framt-compose-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.framt-compose-form input,
+.framt-compose-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+}
+
+.framt-compose-form input:focus,
+.framt-compose-form textarea:focus {
+    outline: none;
+    border-color: #1e3a5f;
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+}
+
+/* Message conversation view */
+.framt-conversation-subject {
+    font-size: 1.125rem;
+    color: #1e3a5f;
+    margin-bottom: 0.5rem;
+}
+
+.framt-conversation-meta {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.framt-conversation-replies {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.framt-reply {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 8px;
+}
+
+.framt-reply.user {
+    background: #f3f4f6;
+    margin-right: 2rem;
+}
+
+.framt-reply.admin {
+    background: #e3f2fd;
+    margin-left: 2rem;
+}
+
+.framt-reply-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.framt-reply-author {
+    font-weight: 600;
+    color: #374151;
+}
+
+.framt-reply-content {
+    white-space: pre-wrap;
+    line-height: 1.5;
+    font-size: 0.9375rem;
+}
+
+/* Reply form in conversation */
+.framt-reply-form {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1rem;
+}
+
+.framt-reply-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    resize: vertical;
+    min-height: 80px;
+    margin-bottom: 0.75rem;
+}
+
+.framt-reply-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.framt-message-actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.framt-delete-message {
+    background: none;
+    border: none;
+    color: #dc2626;
+    cursor: pointer;
+    font-size: 0.8125rem;
+}
+
+.framt-delete-message:hover {
+    text-decoration: underline;
+}
+
+/* =============================================
+   MESSAGES DASHBOARD CARD
+   ============================================= */
+
+.framt-messages-card {
+    margin-bottom: 1rem;
+}
+
+.framt-messages-card .framt-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.framt-messages-card .framt-card-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+}
+
+.framt-messages-card .framt-unread-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: #e85a1b;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 9px;
+}
+
+.framt-messages-empty {
+    text-align: center;
+    padding: 1rem 0.75rem;
+    color: #6b7280;
+}
+
+.framt-messages-empty p {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.8125rem;
+}
+
+.framt-messages-list-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.framt-message-row {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    gap: 0.75rem;
+}
+
+.framt-message-row:hover {
+    background: #f3f4f6;
+}
+
+.framt-message-row.unread {
+    background: #fff8e5;
+    border-left: 3px solid #e85a1b;
+}
+
+.framt-message-indicator {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.framt-message-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.framt-message-subject-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.framt-msg-subject {
+    font-weight: 500;
+    color: #1e3a5f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.framt-message-row.unread .framt-msg-subject {
+    font-weight: 600;
+}
+
+.framt-msg-status {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.framt-msg-status.open {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.framt-msg-status.closed {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.framt-message-preview-text {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.framt-message-date {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    flex-shrink: 0;
+}
+
+.framt-messages-footer {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+/* ==========================================================================
+   Guide Chat Interface (similar to Document Chat)
+   ========================================================================== */
+
+.framt-guide-chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 400px;
+    background: var(--fra-card, #fafaf8);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.framt-guide-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--fra-border, #e8e6e1);
+    background: white;
+}
+
+.framt-guide-chat-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.framt-guide-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.framt-guide-chat-message {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 85%;
+}
+
+.framt-guide-chat-ai {
+    align-self: flex-start;
+}
+
+.framt-guide-chat-user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.framt-guide-chat-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.framt-guide-chat-user .framt-guide-chat-avatar {
+    background: #d4a853;
+}
+
+.framt-guide-chat-bubble {
+    background: #f5f5f0;
+    padding: 0.875rem 1.125rem;
+    border-radius: 12px;
+    border-top-left-radius: 4px;
+    line-height: 1.5;
+}
+
+.framt-guide-chat-user .framt-guide-chat-bubble {
+    background: #1a1a1a;
+    color: #fafaf8;
+    border-radius: 12px;
+    border-top-right-radius: 4px;
+}
+
+.framt-guide-chat-bubble p {
+    margin: 0 0 0.5rem;
+}
+
+.framt-guide-chat-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+.framt-guide-chat-bubble strong {
+    font-weight: 600;
+}
+
+.framt-guide-chat-bubble em {
+    font-style: italic;
+    color: #6b7280;
+}
+
+/* Guide Chat Options */
+.framt-guide-chat-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-left: 48px;
+    margin-top: 0.5rem;
+}
+
+.framt-guide-chat-option {
+    padding: 0.625rem 1rem;
+    background: white;
+    border: 1px solid #e8e6e1;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.framt-guide-chat-option:hover:not(:disabled) {
+    background: #f5f5f0;
+    border-color: #d4a853;
+}
+
+.framt-guide-chat-option:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.framt-guide-chat-option.selected {
+    background: #1a1a1a;
+    color: #fafaf8;
+    border-color: #1a1a1a;
+}
+
+/* Guide Chat Multi-select */
+.framt-guide-chat-multi {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-left: 48px;
+    margin-top: 0.5rem;
+}
+
+.framt-guide-multi-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 1rem;
+    background: white;
+    border: 1px solid #e8e6e1;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.framt-guide-multi-option:hover {
+    background: #f5f5f0;
+    border-color: #d4a853;
+}
+
+.framt-guide-multi-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #d4a853;
+}
+
+.framt-guide-multi-option input[type="checkbox"]:disabled {
+    opacity: 0.5;
+}
+
+.framt-guide-multi-continue {
+    margin-top: 0.5rem;
+    align-self: flex-start;
+}
+
+/* Guide Chat Input */
+.framt-guide-chat-input-area {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e8e6e1;
+    background: white;
+}
+
+.framt-guide-chat-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e8e6e1;
+    border-radius: 24px;
+    font-size: 0.95rem;
+    background: #fafaf8;
+}
+
+.framt-guide-chat-input:focus {
+    outline: none;
+    border-color: #d4a853;
+    box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.1);
+}
+
+#framt-guide-chat-send {
+    border-radius: 24px;
+    padding: 0.75rem 1.5rem;
+}
+
+/* Guide Typing Indicator */
+.framt-guide-typing .framt-guide-chat-bubble {
+    padding: 0.75rem 1.25rem;
+}
+
+.framt-typing-dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.framt-typing-dots span {
+    width: 8px;
+    height: 8px;
+    background: #9ca3af;
+    border-radius: 50%;
+    animation: framt-typing-bounce 1.4s infinite ease-in-out both;
+}
+
+.framt-typing-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.framt-typing-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes framt-typing-bounce {
+    0%, 80%, 100% {
+        transform: scale(0.6);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
